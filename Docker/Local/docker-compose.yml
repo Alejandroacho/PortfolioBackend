@@ -1,0 +1,121 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: django-app
+    build:
+      context: ../../
+      dockerfile: ${DOCKERFILE_PATH}
+    image: &app app
+    restart: always
+    command: ${START_DJANGO}
+    env_file: &envfile
+      - ../../Envs/local.env
+    ports:
+      - 8000:8000
+    volumes:
+      - ../../Apps:/App/Apps
+      - ../../Project:/App/Project
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    container_name: database
+    platform: linux/x86_64
+    image: ${MYSQL}
+    restart: always
+    env_file: *envfile
+    volumes:
+      - ${DATA_FOLDER}/mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    healthcheck:
+      test: ${MYSQL_HEALTH_CHECK}
+      interval: 1s
+      timeout: 10s
+      retries: 120
+
+  redis:
+    container_name: redis
+    image: ${REDIS}
+    ports:
+      - 6378:6379
+    volumes:
+      - ${DATA_FOLDER}/redisdata:/data
+    depends_on:
+      - database
+
+  celery-worker:
+    container_name: celery-worker
+    build:
+      context: ../../
+      dockerfile: ${DOCKERFILE_PATH}
+    image: *app
+    restart: always
+    env_file: *envfile
+    command: ${START_CELERY_WORKER}
+    depends_on:
+      - rabbitmq
+
+  celery-beat:
+    container_name: celery-beat
+    build:
+      context: ../../
+      dockerfile: ${DOCKERFILE_PATH}
+    image: *app
+    env_file: *envfile
+    command: ${START_CELERY_BEAT}
+    depends_on:
+      - celery-worker
+
+  flower:
+    container_name: flower
+    image: ${FLOWER}
+    restart: "no"
+    env_file: *envfile
+    ports:
+      - 5555:5555
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: ${RABBIT}
+    env_file: *envfile
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ${DATA_FOLDER}/rabbitmq_data:/data
+    depends_on:
+      database:
+        condition: service_healthy
+
+  grafana:
+    container_name: grafana
+    image: ${GRAFANA}
+    user: root
+    ports:
+      - 3000:3000
+    volumes:
+      - ${DATA_FOLDER}/grafana_data:/var/lib/grafana
+      - ${DATA_FOLDER}/grafana/provisioning/:/etc/grafana/provisioning/
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+
+  prometheus:
+    container_name: prometheus
+    image: ${PROMETHEUS}
+    volumes:
+      - ${PROMETHEUS_YML}:/etc/prometheus/prometheus.yml
+    command: --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    depends_on:
+      database:
+        condition: service_healthy
