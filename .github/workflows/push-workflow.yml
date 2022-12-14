@@ -1,0 +1,96 @@
+name: Versioning workflow
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'staging'
+      - 'dev'
+
+jobs:
+  Docker-Tag:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🔀 Checkout
+      uses: actions/checkout@v3
+    - name: 🖥️ Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: ⌨️ Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: 🙍 Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: 🏗️ Build and push master
+      if: ${{ github.ref == 'refs/heads/master' }}
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ./Envs/Production/Dockerfile
+        push: true
+        tags: |
+          ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPONAME}}:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
+    - name: 🏗️ Build and push staging
+      if: ${{ github.ref == 'refs/heads/staging' }}
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ./Envs/Staging/Dockerfile
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
+    - name: 🏗️ Build and push dev
+      if: ${{ github.ref == 'refs/heads/dev' }}
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ./Envs/Dev/Dockerfile
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
+
+  Github-Versioning:
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: [Docker-Tag]
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - id: release
+        name: 🔏 Generates release and tag for code versioning
+        uses: rymndhng/release-on-push-action@master
+        with:
+          bump_version_scheme: patch
+          tag_prefix: v
+          use_github_release_notes: true
+      - name: 📣 Check versioning
+        run: |
+          echo "Got tag name ${{ steps.release.outputs.tag_name }}"
+          echo "Got release version ${{ steps.release.outputs.version }}"
+
+  Deploy:
+    needs: [Github-Versioning]
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🔀 Checkout
+      uses: actions/checkout@v3
+    # - name: 🚁 Deploy on PRE
+    #   if: ${{ github.base_ref == 'create-github-actions' }}
+    #   run: # Command to deploy on PRE environment
+    # - name: 🛫 Deploy on Staging
+    #   if: ${{ github.base_ref == 'create-github-actions' }}
+    #   run: # Command to deploy on STAGING environment
+    # - name: 🚀 Deploy on Production
+    #   if: ${{ github.base_ref == 'create-github-actions' }}
+    #   run: # Command to deploy on PRODUCTION environment
+
+  Done:
+    needs: [Deploy]
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🎉 Congratulations
+      run: echo "Everything is updated! 🎉"
