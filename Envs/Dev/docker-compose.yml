@@ -12,7 +12,7 @@ services:
     env_file: &envfile
       - ../../Envs/Local/variables.env
     ports:
-      - 8000:8000
+      - 5000:5000
     volumes:
       - ../../Apps:/App/Apps
       - ../../Project:/App/Project
