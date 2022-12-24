@@ -16,15 +16,12 @@ services:
     volumes:
       - ../../Apps:/App/Apps
       - ../../Project:/App/Project
+      - ../../Envs/Local/test_django_settings.py:/App/Envs/Local/test_django_settings.py
+      - ../../Envs/Local/django_settings.py:/App/Envs/Local/django_settings.py
+      - ../../Envs/default_django_settings.py:/App/Envs/default_django_settings.py
     depends_on:
       database:
         condition: service_healthy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`api.localhost`)"
-      - "traefik.http.routers.api.entrypoints=web"
-      - "traefik.http.routers.api.service=api"
-      - "traefik.http.services.api.loadbalancer.server.port=8000"
 
   database:
     container_name: database
@@ -125,13 +122,3 @@ services:
     depends_on:
       database:
         condition: service_healthy
-
-  traefik:
-    image: traefik:v2.3
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik.yml:/etc/traefik/traefik.yml
