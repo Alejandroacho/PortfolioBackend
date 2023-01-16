@@ -1,16 +1,16 @@
 ## Variables used in target commands
 SHELL := /bin/bash
 ENV ?= Local
-SETTINGS ?= $(shell echo $(ENV) | tr '[:upper:]' '[:lower:]')
+SETTINGS_ENV ?= ${ENV}
 
 ## Variables to make targets more readable
 COMMAND = docker exec -it django-app bash -c
 NON_INTERACTIVE_COMMAND = docker exec -i django-app bash -c
 MANAGE = python manage.py
-DOCKER_ENV_FILE = --env-file ./Envs/${ENV}/docker.variables.env
+DOCKER_ENV_FILE = --env-file ./Envs/${ENV}/variables.env
 DOCKER_COMPOSE_FILE = -f ./Envs/${ENV}/docker-compose.yml
 DOCKER_FILE = docker-compose ${DOCKER_COMPOSE_FILE} ${DOCKER_ENV_FILE}
-SETTINGS_FLAG = --settings=Project.settings.django.${SETTINGS}_settings
+SETTINGS_FLAG = --settings=Envs.${SETTINGS_ENV}.django_settings
 
 ## Modules settings
 TOML_PATH = ./Project/settings/pyproject.toml
@@ -19,8 +19,8 @@ ISORT_SETTINGS = --settings-path="${TOML_PATH}"
 INSTALL_FORMAT_MODULES = pip3 install -r ./Envs/format_requirements.txt
 
 ## Testing settings
-DJANGO_TEST_SETTINGS = --ds=Project.settings.django.test_settings
-PYTEST_FLAGS =  -p no:cacheprovider -p no:warnings
+DJANGO_TEST_SETTINGS = --ds=Envs.${ENV}.test_django_settings
+PYTEST_FLAGS = -p no:cacheprovider -p no:warnings
 PYTEST_SETTINGS = ${PYTEST_FLAGS} ${DJANGO_TEST_SETTINGS}
 COVERAGE_SETTINGS = --cov --cov-config=.coveragerc
 HTML_PATH = --cov-report=html:./Project/.htmlconv
@@ -37,14 +37,13 @@ help:	## Show this help which show all the possible make targets and its descrip
 	@echo ""
 	@awk ' BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / ${STYLE}' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "You can change the environment with the ENV parameter in every target."
-	@echo "* You can modify the settings with SETTINGS parameter."
+	@echo "* You can change the environment settings with the SETTINGS_ENV."
 	@echo "** You can grep a string with GREP parameter."
 	@echo "*** You can modify the number of instances created with INSTANCES parameter."
 	@echo "**** You can modify the path that will be tested with TEST_PATH parameter."
 	@echo ""
 	@echo "You can interact with docker-compose using the following schema:"
-	@echo "docker-compose ${DOCKER_COMPOSE_FILE} ${DOCKER_ENV_FILE}"
+	@echo "${DOCKER_FILE}"
 
 ifeq (docker,$(firstword $(MAKECMDGOALS)))
   ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -53,6 +52,14 @@ endif
 .PHONY: docker
 docker: ## Runs docker compose command. Eg: "make docker up FLAGS=-d".
 	@${DOCKER_FILE} $(ARGS) ${FLAGS}
+
+ifeq (manage,$(firstword $(MAKECMDGOALS)))
+  ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(ARGS):;@:)
+endif
+.PHONY: manage
+manage: ## Runs python manage command. Eg: "make manage collectstatic".
+	${COMMAND} "${MANAGE} $(ARGS) ${SETTINGS_FLAG}"
 
 .PHONY: bash
 bash: ## Open a bash shell in the django container.
@@ -65,9 +72,9 @@ shell: ## Open the shell_plus of django. *
 .PHONY: show_urls
 show_urls: ## Show the urls of the app. **
 ifeq (${GREP},)
-	@${COMMAND} "${MANAGE} show_urls"
+	@${COMMAND} "${MANAGE} show_urls ${SETTINGS_FLAG}"
 else
-	@${COMMAND} "${MANAGE} show_urls | grep ${GREP}"
+	@${COMMAND} "${MANAGE} show_urls ${SETTINGS_FLAG} | grep ${GREP}"
 endif
 
 .PHONY: flush
@@ -86,7 +93,7 @@ populate: ## Populates the database with dummy data. ***
 
 .PHONY: test
 test: ## Run the tests. ****
-	@${COMMAND} "${MANAGE} create_test_db"
+	@${COMMAND} "${MANAGE} create_test_db ${SETTINGS_FLAG}"
 ifeq (${TEST_PATH},)
 	@${COMMAND} "pytest . --reuse-db ${PYTEST_SETTINGS}"
 else
@@ -99,12 +106,12 @@ fast-test: ## Run the tests in parallel. ****
 
 .PHONY: test-with-coverage
 test-with-coverage: ## Run the tests with coverage.
-	@${COMMAND} "${MANAGE} create_test_db"
+	@${COMMAND} "${MANAGE} create_test_db ${SETTINGS_FLAG}"
 	@${COMMAND} "pytest . ${PYTEST_SETTINGS} ${COVERAGE_SETTINGS}"
 
 .PHONY: test-with-html
 test-with-html: ## Run the tests with coverage and html report.
-	@${COMMAND} "${MANAGE} create_test_db"
+	@${COMMAND} "${MANAGE} create_test_db ${SETTINGS_FLAG}"
 	@${COMMAND} "pytest . ${PYTEST_SETTINGS} ${HTML_COVERAGE_SETTINGS}"
 
 .PHONY: check-lint
@@ -112,7 +119,7 @@ check-lint: ## Check for linting errors.
 ifeq (${ENV}, CI)
 	@${INSTALL_FORMAT_MODULES} && black . ${BLACK_SETTINGS} --check
 else
-	@${COMMAND} "isort . ${ISORT_SETTINGS} --check"
+	@${COMMAND} "black . ${BLACK_SETTINGS} --check"
 endif
 
 .PHONY: check-imports

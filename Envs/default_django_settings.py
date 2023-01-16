@@ -8,7 +8,7 @@ from Project.settings.jet_settings import *
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR: str = Path(__file__).resolve().parent.parent.parent.parent
+BASE_DIR: str = Path(__file__).resolve().parent.parent
 sys.path.insert(0, os.path.join(BASE_DIR, "Apps"))
 
 
@@ -22,9 +22,10 @@ URL: str = ""
 FRONTEND_URL: str = ""
 
 SPECIAL_APPS: list = [
+    "whitenoise.runserver_nostatic",
     "jet.dashboard",
     "jet",
-]  # Jet needs to charge before the admin app
+]  # Jet and Whitenoise needs to charge before the admin app
 
 DJANGO_APPS: list = [
     "django.contrib.admin",
@@ -48,7 +49,7 @@ THIRD_PARTY_APPS: list = [
     "corsheaders",
 ]
 
-LOCAL_APPS: list = ["Project", "Users", "Emails"]
+LOCAL_APPS: list = ["Envs", "Project", "Users", "Emails"]
 
 INSTALLED_APPS: list = (
     SPECIAL_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -61,6 +62,7 @@ MIDDLEWARE: list = [
     "django.middleware.common.CommonMiddleware",
     "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -230,10 +232,9 @@ VERIFY_EMAIL_CONTENT: str = _(
 VERIFY_EMAIL_LINK_TEXT: str = _("Verify email")
 VERIFY_EMAIL_URL: str = f"{URL}/api/users"
 
-# Storage
-
+## Storage
 DEFAULT_FILE_STORAGE: str = "django.core.files.storage.FileSystemStorage"
-
+# AWS
 AWS_ACCESS_KEY_ID: str = None
 AWS_STORAGE_DOCUMENT_BUCKET_NAME: str = None
 AWS_STORAGE_IMAGE_BUCKET_NAME: str = None
@@ -249,6 +250,5 @@ GOOGLE_CLIENT_SECRET: str = None
 TWITTER_API_KEY: str = None
 TWITTER_API_SECRET_KEY: str = None
 TWITTER_API_BEARER_TOKEN: str = None
-
-## OAUTH
+# OAUTH SETTINGS
 OAUTH_PASSWORD: str = None

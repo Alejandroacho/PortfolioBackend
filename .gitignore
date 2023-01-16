@@ -1,5 +1,8 @@
-app/data/
-!test.env
+# Sensitive environment variables
+Envs/Production/*.env
+Envs/Staging/*.env
+Envs/Dev/*.env
+
 
 # celery beat
 *.bak
@@ -9,6 +12,7 @@ app/data/
 
 # Mac
 .DS_Store
+*.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -132,3 +136,8 @@ media/
 
 # VSCode
 .vscode/
+
+# Others
+
+app/data/
+!test.env
