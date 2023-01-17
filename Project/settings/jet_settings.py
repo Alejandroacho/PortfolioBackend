@@ -76,6 +76,11 @@ JET_SIDE_MENU_ITEMS: list = [
         ],
     },
     {
+        "label": ("Portfolio"),
+        "app_label": "Technologies",
+        "items": [{"name": "technology"}],
+    },
+    {
         "label": ("Administration"),
         "app_label": "admin",
         "items": [
