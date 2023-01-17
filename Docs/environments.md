@@ -262,7 +262,7 @@ TRAEFIK = traefik:v2.3
 ######################################
 # Docker compose environment Variables
 ######################################
-APP_NAME = BackendTemplate
+APP_NAME = Portfolio
 
 
 ######################################
