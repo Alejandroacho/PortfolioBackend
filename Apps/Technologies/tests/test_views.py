@@ -43,13 +43,18 @@ class TestCreateEndpoint:
 
 @pytest.mark.django_db
 class TestRetrieveEndpoint:
-    def url(self, technology_id: int) -> str:
-        return reverse(
-            "technologies:technologies-detail", kwargs={"pk": technology_id}
+    def url(self, technology_id: int = None) -> str:
+        return (
+            reverse(
+                "technologies:technologies-detail", kwargs={"pk": technology_id}
+            )
+            if technology_id
+            else reverse("technologies:technologies-list")
         )
 
     def test_url(self) -> None:
         assert self.url(1) == "/api/technologies/1/"
+        assert self.url() == "/api/technologies/"
 
     def test_fails_as_unauthenticated(self) -> None:
         technology: Technology = TechnologyFaker()
@@ -65,7 +70,7 @@ class TestRetrieveEndpoint:
         response: Response = client.get(self.url(technology.id))
         assert response.status_code == 403
 
-    def test_works_as_admin(self) -> None:
+    def test_retrieve_works_as_admin(self) -> None:
         technology: Technology = TechnologyFaker()
         user: User = AdminFaker()
         client: APIClient = APIClient()
@@ -74,6 +79,19 @@ class TestRetrieveEndpoint:
         assert response.status_code == 200
         assert response.data["id"] == technology.id
         assert response.data["name"] == technology.name
+
+    def test_list_works_as_admin(self) -> None:
+        technology: Technology = TechnologyFaker()
+        technology2: Technology = TechnologyFaker()
+        user: User = AdminFaker()
+        client: APIClient = APIClient()
+        client.force_authenticate(user)
+        response: Response = client.get(self.url())
+        assert response.status_code == 200
+        assert response.data[1]["id"] == technology.id
+        assert response.data[1]["name"] == technology.name
+        assert response.data[0]["id"] == technology2.id
+        assert response.data[0]["name"] == technology2.name
 
 
 @pytest.mark.django_db
