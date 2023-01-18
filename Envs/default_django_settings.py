@@ -49,7 +49,14 @@ THIRD_PARTY_APPS: list = [
     "corsheaders",
 ]
 
-LOCAL_APPS: list = ["Envs", "Project", "Users", "Emails", "Technologies"]
+LOCAL_APPS: list = [
+    "Envs",
+    "Project",
+    "Users",
+    "Emails",
+    "Technologies",
+    "SocialNetworks",
+]
 
 INSTALLED_APPS: list = (
     SPECIAL_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
