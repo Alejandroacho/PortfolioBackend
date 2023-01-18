@@ -1,18 +1,12 @@
 import pytest
 from django.urls import reverse
-from pytest import fixture
-from pytest import mark
 from rest_framework.response import Response
 from rest_framework.test import APIClient
 
-from Emails.fakers.email import EmailTestFaker
-from Emails.models import Email
-from Technologies.factories import TechnologyFactory
 from Technologies.fakers import TechnologyFaker
 from Technologies.models import Technology
 from Users.fakers.user import AdminFaker
 from Users.fakers.user import UserFaker
-from Users.fakers.user import VerifiedUserFaker
 from Users.models import User
 
 
