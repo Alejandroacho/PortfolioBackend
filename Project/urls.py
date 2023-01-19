@@ -29,6 +29,13 @@ urlpatterns: list = [
         ),
     ),
     path(
+        "api/",
+        include(
+            ("SocialNetworks.urls", "social-networks"),
+            namespace="social-networks",
+        ),
+    ),
+    path(
         "api/oauth/", include(("Users.OAuth.urls", "oauth"), namespace="oauth")
     ),
     path("api/", include(("Users.Auth.urls", "auth"), namespace="auth")),
