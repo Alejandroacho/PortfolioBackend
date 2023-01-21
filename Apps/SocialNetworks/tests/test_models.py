@@ -6,7 +6,7 @@ from SocialNetworks.models import SocialNetwork
 
 
 @pytest.mark.django_db
-class TestTechnologyModel:
+class TestSocialNetworkModel:
     def test_model_keys(self) -> None:
         social_network: SocialNetwork = SocialNetworkFaker()
         assert hasattr(social_network, "id")
@@ -24,7 +24,7 @@ class TestTechnologyModel:
 
 
 @pytest.mark.django_db
-class TestTechnologyFactory:
+class TestSocialNetworkFactory:
     def test_factory_creates_an_instance(self) -> None:
         assert SocialNetwork.objects.count() == 0
         social_network: SocialNetwork = SocialNetworkFactory(
@@ -37,7 +37,7 @@ class TestTechnologyFactory:
 
 
 @pytest.mark.django_db
-class TestTechnologyFaker:
+class TestSocialNetworkFaker:
     def test_faker_create_the_default_python_instance(self) -> None:
         assert SocialNetwork.objects.count() == 0
         social_network: SocialNetwork = SocialNetworkFaker()
