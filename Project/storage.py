@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Model
 from storages.backends.s3boto3 import S3Boto3Storage
 
@@ -22,6 +23,7 @@ class FilePathHandler:
     }
     folder_names_mapping: dict = {
         # Default: instance model name in lower case + file_type
+        "Image": "image"
     }
     id_in_folder_mapping: dict = {
         # Default: instance id
@@ -45,7 +47,10 @@ class FilePathHandler:
     @property
     def id_in_file(self) -> int:
         attribute: str = self.id_in_file_mapping.get(self.model_name, "id")
-        return getattr(self.instance, attribute, self.instance.pk)
+        return (
+            getattr(self.instance, attribute, self.instance.pk)
+            or self.get_last_id()
+        )
 
     @property
     def full_file_name(self) -> str:
@@ -61,7 +66,18 @@ class FilePathHandler:
     @property
     def id_in_folder(self) -> int:
         attribute: str = self.id_in_folder_mapping.get(self.model_name, "id")
-        return getattr(self.instance, attribute, self.instance.pk)
+        return (
+            getattr(self.instance, attribute, self.instance.pk)
+            or self.get_last_id()
+        )
+
+    def get_last_id(self) -> int:
+        content_type: ContentType = ContentType.objects.get(
+            model=self.model_name
+        )
+        model_class: Model = content_type.model_class()
+        last_id: int = model_class.objects.values_list("id", flat=True).last()
+        return last_id + 1 if last_id else 1
 
     def get_file_path(self) -> str:
         return (
