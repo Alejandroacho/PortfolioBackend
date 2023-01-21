@@ -56,6 +56,7 @@ LOCAL_APPS: list = [
     "Emails",
     "Technologies",
     "SocialNetworks",
+    "Images",
 ]
 
 INSTALLED_APPS: list = (

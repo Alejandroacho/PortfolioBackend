@@ -80,6 +80,11 @@ JET_SIDE_MENU_ITEMS: list = [
                 "url": "/admin/SocialNetworks/socialnetwork/",
                 "url_blank": False,
             },
+            {
+                "label": "Images",
+                "url": "/admin/Images/image/",
+                "url_blank": False,
+            },
         ],
     },
     {
