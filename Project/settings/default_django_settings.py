@@ -56,6 +56,7 @@ LOCAL_APPS: list = [
     "Emails",
     "Technologies",
     "SocialNetworks",
+    "Images",
 ]
 
 INSTALLED_APPS: list = (
@@ -177,7 +178,7 @@ STATIC_URL: str = "/static/"
 STATIC_PATH: str = "Project/static"
 STATICFILES_DIRS: tuple = (os.path.join(BASE_DIR, STATIC_PATH),)
 MEDIA_URL: str = "/media/"
-MEDIA_PATH: str = "Apps/Media"
+MEDIA_PATH: str = "Project/Media"
 MEDIA_DIRS: str = os.path.join(BASE_DIR, MEDIA_PATH)
 TEMPLATES: list = [
     {
