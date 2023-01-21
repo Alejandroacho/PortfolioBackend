@@ -5,6 +5,7 @@ from Project.storage import FilePathHandler
 from Project.storage import ImageStorage
 from Project.storage import are_aws_variables_set
 from Project.storage import get_image_storage
+from Users.factories.user import UserFactory
 from Users.fakers.user import UserFaker
 from Users.models import User
 
@@ -105,6 +106,21 @@ class TestFilePathHandler:
         path_handler: FilePathHandler = FilePathHandler(user, None, "images")
         path_handler.id_in_folder_mapping: dict = {"User": "email"}
         assert path_handler.id_in_folder == user.email
+
+    def test_get_last_id_with_instances_in_db(self) -> None:
+        user: User = UserFaker()
+        non_saved_user: User = UserFactory.build(email="user@appname.me")
+        path_handler: FilePathHandler = FilePathHandler(
+            non_saved_user, None, "images"
+        )
+        assert path_handler.get_last_id() == user.id + 1
+
+    def test_get_last_id_without_instances_in_db(self) -> None:
+        non_saved_user: User = UserFactory.build(email="user@appname.me")
+        path_handler: FilePathHandler = FilePathHandler(
+            non_saved_user, None, "images"
+        )
+        assert path_handler.get_last_id() == 1
 
     def test_get_file_path(self) -> None:
         user: User = UserFaker()
