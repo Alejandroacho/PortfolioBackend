@@ -19,6 +19,6 @@ class Image(Model):
         "Image",
         storage=get_image_storage(),
         upload_to=image_file_upload,
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
     )
