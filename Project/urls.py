@@ -36,6 +36,13 @@ urlpatterns: list = [
         ),
     ),
     path(
+        "api/",
+        include(
+            ("Images.urls", "images"),
+            namespace="images",
+        ),
+    ),
+    path(
         "api/oauth/", include(("Users.OAuth.urls", "oauth"), namespace="oauth")
     ),
     path("api/", include(("Users.Auth.urls", "auth"), namespace="auth")),
