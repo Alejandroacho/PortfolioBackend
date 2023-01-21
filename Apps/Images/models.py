@@ -22,3 +22,6 @@ class Image(Model):
         null=False,
         blank=False,
     )
+
+    def __str__(self) -> str:
+        return f"{self.id} | {self.type} image"
