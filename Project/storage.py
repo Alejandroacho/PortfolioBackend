@@ -72,19 +72,21 @@ class FilePathHandler:
 
 
 def image_file_upload(instance: Model, filename: str) -> str:
-    path: FilePathHandler = FilePathHandler(instance, filename, "images")
-    if not aws_variables_set():
+    path_handler: FilePathHandler = FilePathHandler(
+        instance, filename, "images"
+    )
+    if not are_aws_variables_set():
         base_path: str = f"{settings.MEDIA_PATH}/"
-    return f"{base_path}{path.get_file_path()}"
+    return f"{base_path}{path_handler.get_file_path()}"
 
 
 def get_image_storage() -> ImageStorage or None:
-    if not aws_variables_set():
+    if not are_aws_variables_set():
         return None
     return ImageStorage()
 
 
-def aws_variables_set() -> bool:
+def are_aws_variables_set() -> bool:
     return (
         settings.AWS_ACCESS_KEY_ID
         and settings.AWS_SECRET_ACCESS_KEY
