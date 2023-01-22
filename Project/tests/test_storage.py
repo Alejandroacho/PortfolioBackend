@@ -1,10 +1,16 @@
-import pytest
 from django.test import override_settings
+from mock import patch
+from mock.mock import MagicMock
+from pytest import mark
 
+from Project.storage import DocumentStorage
 from Project.storage import FilePathHandler
 from Project.storage import ImageStorage
 from Project.storage import are_aws_variables_set
+from Project.storage import document_file_upload
+from Project.storage import get_document_storage
 from Project.storage import get_image_storage
+from Project.storage import image_file_upload
 from Users.factories.user import UserFactory
 from Users.fakers.user import UserFaker
 from Users.models import User
@@ -40,6 +46,16 @@ class TestProjectStorage:
     @override_settings(AWS_ACCESS_KEY_ID="test")
     @override_settings(AWS_SECRET_ACCESS_KEY="test")
     @override_settings(AWS_STORAGE_IMAGE_BUCKET_NAME="test")
+    @override_settings(AWS_S3_REGION_NAME="test")
+    @override_settings(AWS_S3_SIGNATURE_VERSION="test")
+    def test_get_document_storage_returns_ImageStorage_instance_if_aws_keys_are_set(
+        self,
+    ) -> None:
+        assert isinstance(get_document_storage(), DocumentStorage)
+
+    @override_settings(AWS_ACCESS_KEY_ID="test")
+    @override_settings(AWS_SECRET_ACCESS_KEY="test")
+    @override_settings(AWS_STORAGE_IMAGE_BUCKET_NAME="test")
     @override_settings(AWS_S3_REGION_NAME=None)
     @override_settings(AWS_S3_SIGNATURE_VERSION="test")
     def test_get_image_storage_returns_None_if_a_aws_keys_is_not_set(
@@ -47,8 +63,18 @@ class TestProjectStorage:
     ) -> None:
         assert not get_image_storage()
 
+    @override_settings(AWS_ACCESS_KEY_ID="test")
+    @override_settings(AWS_SECRET_ACCESS_KEY="test")
+    @override_settings(AWS_STORAGE_IMAGE_BUCKET_NAME="test")
+    @override_settings(AWS_S3_REGION_NAME=None)
+    @override_settings(AWS_S3_SIGNATURE_VERSION="test")
+    def test_get_document_storage_returns_None_if_a_aws_keys_is_not_set(
+        self,
+    ) -> None:
+        assert not get_document_storage()
 
-@pytest.mark.django_db
+
+@mark.django_db
 class TestFilePathHandler:
     def test_model_name_returns_model_name(self) -> None:
         assert FilePathHandler(UserFaker(), None, None).model_name == "User"
@@ -138,3 +164,18 @@ class TestFilePathHandler:
             + f"/custom_file_name_{user.first_name}.png"
         )
         assert path_handler.get_file_path() == expected_path
+
+
+@mark.django_db
+class TestFileUploadFunctions:
+    @patch("Project.storage.FilePathHandler.get_file_path")
+    def test_image_file_upload(self, get_file_path: MagicMock) -> None:
+        user: User = UserFaker()
+        assert isinstance(image_file_upload(user, "image.png"), str)
+        assert get_file_path.called_once()
+
+    @patch("Project.storage.FilePathHandler.get_file_path")
+    def test_document_file_upload(self, get_file_path: MagicMock) -> None:
+        user: User = UserFaker()
+        assert isinstance(document_file_upload(user, "document.pdf"), str)
+        assert get_file_path.called_once()

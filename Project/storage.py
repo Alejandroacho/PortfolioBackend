@@ -4,12 +4,19 @@ from django.db.models import Model
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
-class ImageStorage(S3Boto3Storage):
-    bucket_name: str = settings.AWS_STORAGE_IMAGE_BUCKET_NAME
+class FileStorage(S3Boto3Storage):
     access_key: str = settings.AWS_ACCESS_KEY_ID
     secret_key: str = settings.AWS_SECRET_ACCESS_KEY
     region_name: str = settings.AWS_S3_REGION_NAME
     signature_version: str = settings.AWS_S3_SIGNATURE_VERSION
+
+
+class ImageStorage(FileStorage):
+    bucket_name: str = settings.AWS_STORAGE_IMAGE_BUCKET_NAME
+
+
+class DocumentStorage(FileStorage):
+    bucket_name: str = settings.AWS_STORAGE_DOCUMENT_BUCKET_NAME
 
 
 class FilePathHandler:
@@ -88,18 +95,26 @@ class FilePathHandler:
 
 
 def image_file_upload(instance: Model, filename: str) -> str:
-    path_handler: FilePathHandler = FilePathHandler(
-        instance, filename, "images"
-    )
+    return file_upload(instance, filename, "images")
+
+
+def document_file_upload(instance: Model, filename: str) -> str:
+    return file_upload(instance, filename, "documents")
+
+
+def file_upload(instance: Model, filename: str, type: str) -> str:
+    path_handler: FilePathHandler = FilePathHandler(instance, filename, type)
     if not are_aws_variables_set():
         base_path: str = f"{settings.MEDIA_PATH}/"
-    return f"{base_path}{path_handler.get_file_path()}"
+    return f"{base_path}{path_handler.g()}"
 
 
 def get_image_storage() -> ImageStorage or None:
-    if not are_aws_variables_set():
-        return None
-    return ImageStorage()
+    return None if not are_aws_variables_set() else ImageStorage()
+
+
+def get_document_storage() -> DocumentStorage or None:
+    return None if not are_aws_variables_set() else DocumentStorage()
 
 
 def are_aws_variables_set() -> bool:
