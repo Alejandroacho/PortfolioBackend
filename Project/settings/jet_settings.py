@@ -85,6 +85,11 @@ JET_SIDE_MENU_ITEMS: list = [
                 "url": "/admin/Images/image/",
                 "url_blank": False,
             },
+            {
+                "label": "Certifications",
+                "url": "/admin/Certifications/certification/",
+                "url_blank": False,
+            },
         ],
     },
     {
