@@ -30,9 +30,11 @@ class Certification(Model):
         on_delete=CASCADE,
     )
     file: Field = FileField(
+        "File",
         storage=get_document_storage(),
         upload_to=document_file_upload,
         null=True,
+        blank=True,
     )
 
     def __str__(self) -> str:
