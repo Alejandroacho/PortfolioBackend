@@ -1,0 +1,172 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: django-app
+    build:
+      context: ../../
+      dockerfile: ${DOCKERFILE_PATH}
+    image: &app app
+    restart: always
+    command: ${START_DJANGO}
+    env_file: &envfile
+      - ../../Envs/Local/variables.env
+    ports:
+      - 8000:8000
+    volumes:
+      - ../../Apps:/App/Apps
+      - ../../Project:/App/Project
+      - ../../Envs/Local/test_django_settings.py:/App/Envs/Local/test_django_settings.py
+      - ../../Envs/Local/django_settings.py:/App/Envs/Local/django_settings.py
+    depends_on:
+      database:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`${PROJECT_URL}`)"
+      - "traefik.http.routers.api.service=api"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+      - "traefik.http.routers.api.entrypoints=web"
+
+  database:
+    container_name: database
+    platform: linux/x86_64
+    image: ${MYSQL}
+    restart: always
+    env_file: *envfile
+    volumes:
+      - ${DATA_FOLDER}/mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    healthcheck:
+      test: ${MYSQL_HEALTH_CHECK}
+      interval: 1s
+      timeout: 10s
+      retries: 120
+
+  redis:
+    container_name: redis
+    image: ${REDIS}
+    ports:
+      - 6378:6379
+    volumes:
+      - ${DATA_FOLDER}/redisdata:/data
+    depends_on:
+      - database
+
+  celery-worker:
+    container_name: celery-worker
+    build:
+      context: ../../
+      dockerfile: ${DOCKERFILE_PATH}
+    image: *app
+    restart: always
+    env_file: *envfile
+    command: ${START_CELERY_WORKER}
+    depends_on:
+      - rabbitmq
+
+  celery-beat:
+    container_name: celery-beat
+    build:
+      context: ../../
+      dockerfile: ${DOCKERFILE_PATH}
+    image: *app
+    env_file: *envfile
+    command: ${START_CELERY_BEAT}
+    depends_on:
+      - celery-worker
+
+  flower:
+    container_name: flower
+    image: ${FLOWER}
+    restart: "no"
+    env_file: *envfile
+    ports:
+      - 5555:5555
+    depends_on:
+      - rabbitmq
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flower.rule=Host(`${FLOWER_URL}`)"
+      - "traefik.http.routers.flower.service=flower"
+      - "traefik.http.services.flower.loadbalancer.server.port=5555"
+      - "traefik.http.routers.flower.entrypoints=web"
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: ${RABBIT}
+    env_file: *envfile
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ${DATA_FOLDER}/rabbitmq_data:/data
+    depends_on:
+      database:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rabbit.rule=Host(`${RABBIT_URL}`)"
+      - "traefik.http.routers.rabbit.service=rabbit"
+      - "traefik.http.services.rabbit.loadbalancer.server.port=5672"
+      - "traefik.http.routers.rabbit.entrypoints=web"
+
+  grafana:
+    container_name: grafana
+    image: ${GRAFANA}
+    user: root
+    ports:
+      - 3000:3000
+    volumes:
+      - ${DATA_FOLDER}/grafana_data:/var/lib/grafana
+      - ${DATA_FOLDER}/grafana/provisioning/:/etc/grafana/provisioning/
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`${GRAFANA_URL}`)"
+      - "traefik.http.routers.grafana.service=grafana"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.entrypoints=web"
+
+  prometheus:
+    container_name: prometheus
+    image: ${PROMETHEUS}
+    volumes:
+      - ${PROMETHEUS_YML}:/etc/prometheus/prometheus.yml
+    command: --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    depends_on:
+      database:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`${PROMETHEUS_URL}`)"
+      - "traefik.http.routers.prometheus.service=prometheus"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - "traefik.http.routers.prometheus.entrypoints=web"
+
+  traefik:
+    container_name: traefik
+    image: ${TRAEFIK}
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${TRAEFIK_YML}:/etc/traefik/traefik.yml
+    depends_on:
+      database:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.proxy.rule=Host(`${TRAEFIK_URL}`)"
+      - "traefik.http.routers.proxy.entrypoints=web"
+      - "traefik.http.routers.proxy.service=api@internal"
+      - "traefik.http.services.proxy.loadbalancer.server.port=8080"

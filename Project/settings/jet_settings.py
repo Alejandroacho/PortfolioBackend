@@ -1,3 +1,5 @@
+import os
+
 from django.utils.html import format_html
 
 from Project.settings.labels_with_svg import black_list_with_icon
@@ -10,11 +12,14 @@ from Project.settings.labels_with_svg import redoc_label_with_icon
 from Project.settings.labels_with_svg import suggestion_label_with_icon
 from Project.settings.labels_with_svg import swagger_label_with_icon
 from Project.settings.labels_with_svg import user_label_with_icon
+from Project.utils.services_urls import set_services_urls
 
 
 """
 JET Documentation: https://django-jet-reboot.readthedocs.io/
 """
+
+set_services_urls()
 
 X_FRAME_OPTIONS = "ALLOWALL"
 
@@ -63,7 +68,32 @@ JET_SIDE_MENU_ITEMS: list = [
         ],
     },
     {
-        "label": ("Adminitsration"),
+        "label": "Portfolio",
+        "items": [
+            {
+                "label": "Technologies",
+                "url": "/admin/Technologies/technology/",
+                "url_blank": False,
+            },
+            {
+                "label": "SocialNetworks",
+                "url": "/admin/SocialNetworks/socialnetwork/",
+                "url_blank": False,
+            },
+            {
+                "label": "Images",
+                "url": "/admin/Images/image/",
+                "url_blank": False,
+            },
+            {
+                "label": "Certifications",
+                "url": "/admin/Certifications/certification/",
+                "url_blank": False,
+            },
+        ],
+    },
+    {
+        "label": ("Administration"),
         "app_label": "admin",
         "items": [
             {"name": "logentry", "label": format_html(log_label_with_icon)}
@@ -89,27 +119,23 @@ JET_SIDE_MENU_ITEMS: list = [
         "items": [
             {
                 "label": "Grafana",
-                "url": "http://localhost:3000/",
+                "url": f"http://{os.environ['GRAFANA_URL']}"
+                if os.environ.setdefault("ENV", "local") == "local"
+                else f"https://{os.environ['GRAFANA_URL']}",
                 "url_blank": True,
             },
             {
                 "label": "Prometheus",
-                "url": "http://localhost:9090/",
-                "url_blank": True,
-            },
-            {
-                "label": "RabbitMQ",
-                "url": "http://localhost:15672/",
+                "url": f"http://{os.environ['PROMETHEUS_URL']}"
+                if os.environ.setdefault("ENV", "local") == "local"
+                else f"https://{os.environ['PROMETHEUS_URL']}",
                 "url_blank": True,
             },
             {
                 "label": "Flower",
-                "url": "http://localhost:5555/",
-                "url_blank": True,
-            },
-            {
-                "label": "CloudBeaver",
-                "url": "http://localhost:8081/",
+                "url": f"http://{os.environ['FLOWER_URL']}"
+                if os.environ.setdefault("ENV", "local") == "local"
+                else f"https://{os.environ['FLOWER_URL']}",
                 "url_blank": True,
             },
         ],
