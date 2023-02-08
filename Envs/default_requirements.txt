@@ -24,6 +24,7 @@ drf-spectacular[sidecar]==0.21.0
 facebook-sdk==3.1.0
 factory-boy==3.2.1
 feedparser==6.0.8
+filetype==1.2.0
 google-api-python-client==2.61.0
 markdown==3.3.4
 Pillow==9.3.0
