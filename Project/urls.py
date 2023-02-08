@@ -43,6 +43,13 @@ urlpatterns: list = [
         ),
     ),
     path(
+        "api/",
+        include(
+            ("Certifications.urls", "certifications"),
+            namespace="certifications",
+        ),
+    ),
+    path(
         "api/oauth/", include(("Users.OAuth.urls", "oauth"), namespace="oauth")
     ),
     path("api/", include(("Users.Auth.urls", "auth"), namespace="auth")),
