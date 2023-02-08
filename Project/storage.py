@@ -106,7 +106,7 @@ def file_upload(instance: Model, filename: str, type: str) -> str:
     path_handler: FilePathHandler = FilePathHandler(instance, filename, type)
     if not are_aws_variables_set():
         base_path: str = f"{settings.MEDIA_PATH}/"
-    return f"{base_path}{path_handler.get_file_path()}"
+    return f"{base_path or ''}{path_handler.get_file_path()}"
 
 
 def get_image_storage() -> ImageStorage or None:
