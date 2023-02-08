@@ -25,3 +25,11 @@ class Image(Model):
 
     def __str__(self) -> str:
         return f"{self.id} | {self.type} image"
+
+    @property
+    def url(self) -> str:
+        return self.image.url
+
+    @property
+    def name(self) -> str:
+        return self.image.name
