@@ -58,6 +58,7 @@ LOCAL_APPS: list = [
     "SocialNetworks",
     "Images",
     "Certifications",
+    "Authors",
 ]
 
 INSTALLED_APPS: list = (
