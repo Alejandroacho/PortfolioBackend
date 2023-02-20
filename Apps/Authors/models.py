@@ -14,7 +14,7 @@ class Author(Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.id} | {self.first_name} {self.last_name}"
+        return f"{self.id} | {self.name}"
 
     @property
     def name(self) -> str:
