@@ -10,7 +10,7 @@ class Author(Model):
     first_name: Field = CharField(max_length=100, null=True)
     last_name: Field = CharField(max_length=100, null=True)
     social_networks: Field = ManyToManyField(
-        SocialNetwork, related_name="authors", null=True
+        SocialNetwork, related_name="authors"
     )
 
     def __str__(self) -> str:

@@ -18,14 +18,14 @@ class ProjectFaker(ProjectFactory):
         if not extracted:
             self.technologies.add(TechnologyFaker())
         else:
-            super().images(create, extracted, **kwargs)
+            super().technologies(create, extracted, **kwargs)
 
     @post_generation
     def authors(self, create, extracted, **kwargs):
         if not extracted:
             self.authors.add(AuthorFaker())
         else:
-            super().images(create, extracted, **kwargs)
+            super().authors(create, extracted, **kwargs)
 
     @post_generation
     def images(self, create, extracted, **kwargs):
