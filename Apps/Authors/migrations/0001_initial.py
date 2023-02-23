@@ -29,7 +29,6 @@ class Migration(migrations.Migration):
                 (
                     "social_networks",
                     models.ManyToManyField(
-                        null=True,
                         related_name="authors",
                         to="SocialNetworks.socialnetwork",
                     ),
