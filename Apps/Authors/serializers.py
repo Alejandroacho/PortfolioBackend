@@ -44,7 +44,7 @@ class AuthorSerializer(ModelSerializer):
     def update(self, instance: Author, validated_data: dict) -> Author:
         social_networks = validated_data.pop("social_networks")
         for attribute, value in validated_data.items():
-            setattr(instance, attribute, value)
+            setattr(instance, attribute, value or getattr(instance, attribute))
         instance.social_networks.set(social_networks)
         instance.save()
         return instance
