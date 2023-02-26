@@ -100,6 +100,11 @@ JET_SIDE_MENU_ITEMS: list = [
                 "url": "/admin/Projects/project/",
                 "url_blank": False,
             },
+            {
+                "label": "Maintainers",
+                "url": "/admin/Maintainers/maintainer/",
+                "url_blank": False,
+            },
         ],
     },
     {
