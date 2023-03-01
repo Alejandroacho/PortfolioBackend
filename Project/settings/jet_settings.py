@@ -90,6 +90,21 @@ JET_SIDE_MENU_ITEMS: list = [
                 "url": "/admin/Certifications/certification/",
                 "url_blank": False,
             },
+            {
+                "label": "Authors",
+                "url": "/admin/Authors/author/",
+                "url_blank": False,
+            },
+            {
+                "label": "Projects",
+                "url": "/admin/Projects/project/",
+                "url_blank": False,
+            },
+            {
+                "label": "Maintainers",
+                "url": "/admin/Maintainers/maintainer/",
+                "url_blank": False,
+            },
         ],
     },
     {
