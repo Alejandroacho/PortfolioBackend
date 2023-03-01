@@ -49,6 +49,13 @@ urlpatterns: list = [
             namespace="certifications",
         ),
     ),
+    path(
+        "api/",
+        include(
+            ("Maintainers.urls", "maintainers"),
+            namespace="maintainers",
+        ),
+    ),
     path("api/", include(("Authors.urls", "authors"), namespace="authors")),
     path("api/", include(("Projects.urls", "projects"), namespace="projects")),
     path(
