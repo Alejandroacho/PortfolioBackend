@@ -58,6 +58,9 @@ LOCAL_APPS: list = [
     "SocialNetworks",
     "Images",
     "Certifications",
+    "Authors",
+    "Projects",
+    "Maintainers",
 ]
 
 INSTALLED_APPS: list = (
@@ -261,3 +264,7 @@ TWITTER_API_SECRET_KEY: str = None
 TWITTER_API_BEARER_TOKEN: str = None
 # OAUTH SETTINGS
 OAUTH_PASSWORD: str = None
+
+
+## Maintainers limit
+MAINTAINERS_LIMIT: int = 1

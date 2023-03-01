@@ -50,6 +50,15 @@ urlpatterns: list = [
         ),
     ),
     path(
+        "api/",
+        include(
+            ("Maintainers.urls", "maintainers"),
+            namespace="maintainers",
+        ),
+    ),
+    path("api/", include(("Authors.urls", "authors"), namespace="authors")),
+    path("api/", include(("Projects.urls", "projects"), namespace="projects")),
+    path(
         "api/oauth/", include(("Users.OAuth.urls", "oauth"), namespace="oauth")
     ),
     path("api/", include(("Users.Auth.urls", "auth"), namespace="auth")),
