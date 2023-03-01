@@ -4,6 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from Certifications.models import Certification
 from Certifications.serializers import CertificationSerializer
+from Project.permissions import IsGetPetition
 from Users.permissions import IsAdmin
 from Users.permissions import IsVerified
 
@@ -12,4 +13,6 @@ class CertificationViewSet(ModelViewSet):
     queryset: QuerySet = Certification.objects.all().order_by("-id")
     lookup_url_kwarg: str = "pk"
     serializer_class: CertificationSerializer = CertificationSerializer
-    permission_classes: list = [IsAuthenticated & IsVerified & IsAdmin]
+    permission_classes: list = [
+        (IsAuthenticated & IsVerified & IsAdmin) | IsGetPetition
+    ]
