@@ -86,19 +86,38 @@ class TestRetrieveEndpoint:
         assert self.url(1) == "/api/social-networks/1/"
         assert self.url() == "/api/social-networks/"
 
-    def test_fails_as_unauthenticated(self) -> None:
+    def test_works_as_unauthenticated(self) -> None:
         social_network: SocialNetwork = SocialNetworkFaker()
         client: APIClient = APIClient()
         response: Response = client.get(self.url(social_network.id))
-        assert response.status_code == 401
+        assert response.status_code == 200
+        assert response.data["id"] == social_network.id
+        assert response.data["nickname"] == social_network.nickname
+        assert response.data["url"] == social_network.url
 
-    def test_fails_as_unverified(self) -> None:
+    def test_list_works_as_unauthenticated(self) -> None:
+        social_network: SocialNetwork = SocialNetworkFaker()
+        social_network2: SocialNetwork = SocialNetworkFaker()
+        client: APIClient = APIClient()
+        response: Response = client.get(self.url())
+        assert response.status_code == 200
+        assert response.data[1]["id"] == social_network.id
+        assert response.data[1]["nickname"] == social_network.nickname
+        assert response.data[1]["url"] == social_network.url
+        assert response.data[0]["id"] == social_network2.id
+        assert response.data[0]["nickname"] == social_network2.nickname
+        assert response.data[0]["url"] == social_network2.url
+
+    def test_works_as_unverified(self) -> None:
         social_network: SocialNetwork = SocialNetworkFaker()
         user: User = UserFaker()
         client: APIClient = APIClient()
         client.force_authenticate(user)
         response: Response = client.get(self.url(social_network.id))
-        assert response.status_code == 403
+        assert response.status_code == 200
+        assert response.data["id"] == social_network.id
+        assert response.data["nickname"] == social_network.nickname
+        assert response.data["url"] == social_network.url
 
     def test_retrieve_works_as_admin(self) -> None:
         social_network: SocialNetwork = SocialNetworkFaker()
