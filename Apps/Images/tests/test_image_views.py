@@ -77,19 +77,34 @@ class TestRetrieveEndpoint:
         assert self.url(1) == "/api/images/1/"
         assert self.url() == "/api/images/"
 
-    def test_fails_as_unauthenticated(self) -> None:
+    def test_works_as_unauthenticated(self) -> None:
         image: Image = ImageFaker()
         client: APIClient = APIClient()
         response: Response = client.get(self.url(image.id))
-        assert response.status_code == 401
+        assert response.status_code == 200
 
-    def test_fails_as_unverified(self) -> None:
+    def test_list_works_as_unauthenticated(self) -> None:
+        image: Image = ImageFaker()
+        image2: Image = ImageFaker()
+        client: APIClient = APIClient()
+        response: Response = client.get(self.url())
+        assert response.status_code == 200
+        assert response.data[1]["id"] == image.id
+        assert response.data[1]["description"] == image.description
+        assert response.data[1]["type"] == image.type
+        assert image.image.url in response.data[1]["image"]
+        assert response.data[0]["id"] == image2.id
+        assert response.data[0]["description"] == image2.description
+        assert response.data[0]["type"] == image2.type
+        assert image2.image.url in response.data[0]["image"]
+
+    def test_works_as_unverified(self) -> None:
         image: Image = ImageFaker()
         user: User = UserFaker()
         client: APIClient = APIClient()
         client.force_authenticate(user)
         response: Response = client.get(self.url(image.id))
-        assert response.status_code == 403
+        assert response.status_code == 200
 
     def test_retrieve_works_as_admin(self) -> None:
         image: Image = ImageFaker()

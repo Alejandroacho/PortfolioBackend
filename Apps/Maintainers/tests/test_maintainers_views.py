@@ -173,19 +173,19 @@ class TestRetrieveEndpoint:
         assert self.url(1) == "/api/maintainers/1/"
         assert self.url() == "/api/maintainers/"
 
-    def test_fails_as_unauthenticated(self) -> None:
+    def test_works_as_unauthenticated(self) -> None:
         maintainer: Maintainer = MaintainerFaker()
         client: APIClient = APIClient()
         response: Response = client.get(self.url(maintainer.id))
-        assert response.status_code == 401
+        assert response.status_code == 200
 
-    def test_fails_as_unverified(self) -> None:
+    def test_works_as_unverified(self) -> None:
         maintainer: Maintainer = MaintainerFaker()
         user: User = UserFaker()
         client: APIClient = APIClient()
         client.force_authenticate(user)
         response: Response = client.get(self.url(maintainer.id))
-        assert response.status_code == 403
+        assert response.status_code == 200
 
     def test_retrieve_works_as_admin(self) -> None:
         maintainer: Maintainer = MaintainerFaker()

@@ -102,7 +102,28 @@ class TestRetrieveEndpoint:
         certification: Certification = CertificationFaker()
         client: APIClient = APIClient()
         response: Response = client.get(self.url(certification.id))
-        assert response.status_code == 401
+        assert response.status_code == 200
+
+    def test_list_works_as_unauthenticated(self) -> None:
+        certification: Certification = CertificationFaker()
+        certification2: Certification = CertificationFaker()
+        client: APIClient = APIClient()
+        response: Response = client.get(self.url())
+        assert response.status_code == 200
+        assert response.data[0]["id"] == certification2.id
+        assert response.data[0]["name"] == certification2.name
+        assert response.data[0]["description"] == certification2.description
+        assert response.data[0]["tags"] == f"{certification2.tags}"
+        assert response.data[0]["url"] == certification2.url
+        assert certification2.image.url in response.data[0]["image"]
+        assert certification2.file.url in response.data[0]["file"]
+        assert response.data[1]["id"] == certification.id
+        assert response.data[1]["name"] == certification.name
+        assert response.data[1]["description"] == certification.description
+        assert response.data[1]["tags"] == f"{certification.tags}"
+        assert response.data[1]["url"] == certification.url
+        assert certification.image.url in response.data[1]["image"]
+        assert certification.file.url in response.data[1]["file"]
 
     def test_fails_as_unverified(self) -> None:
         certification: Certification = CertificationFaker()
@@ -110,7 +131,7 @@ class TestRetrieveEndpoint:
         client: APIClient = APIClient()
         client.force_authenticate(user)
         response: Response = client.get(self.url(certification.id))
-        assert response.status_code == 403
+        assert response.status_code == 200
 
     def test_retrieve_works_as_admin(self) -> None:
         certification: Certification = CertificationFaker()

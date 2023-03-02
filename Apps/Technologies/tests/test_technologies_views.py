@@ -60,7 +60,9 @@ class TestRetrieveEndpoint:
         technology: Technology = TechnologyFaker()
         client: APIClient = APIClient()
         response: Response = client.get(self.url(technology.id))
-        assert response.status_code == 401
+        assert response.status_code == 200
+        assert response.data["id"] == technology.id
+        assert response.data["name"] == technology.name
 
     def test_fails_as_unverified(self) -> None:
         technology: Technology = TechnologyFaker()
@@ -68,7 +70,9 @@ class TestRetrieveEndpoint:
         client: APIClient = APIClient()
         client.force_authenticate(user)
         response: Response = client.get(self.url(technology.id))
-        assert response.status_code == 403
+        assert response.status_code == 200
+        assert response.data["id"] == technology.id
+        assert response.data["name"] == technology.name
 
     def test_retrieve_works_as_admin(self) -> None:
         technology: Technology = TechnologyFaker()
