@@ -22,9 +22,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: 🏗️ Create ENV file for master
-      if: ${{ github.ref == 'refs/heads/master' }}
-      run: echo "${{ secrets.PRODUCTION_ENV_FILE }}" > .env
     - name: 🏗️ Build and push master
       if: ${{ github.ref == 'refs/heads/master' }}
       uses: docker/build-push-action@v3
@@ -46,9 +43,6 @@ jobs:
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
-    # - name: 🏗️ Create ENV file for master
-    #   if: ${{ github.ref == 'refs/heads/dev' }}
-    #   run: echo "${{ secrets.PRODUCTION_ENV_FILE }}" > .env
     - name: 🏗️ Build and push dev
       if: ${{ github.ref == 'refs/heads/dev' }}
       uses: docker/build-push-action@v3
@@ -81,19 +75,21 @@ jobs:
           echo "Got release version ${{ steps.release.outputs.version }}"
 
   Deploy:
-    needs: [Github-Versioning]
+    needs: [Docker-Tag]
     runs-on: ubuntu-latest
     steps:
     - name: 🔀 Checkout
       uses: actions/checkout@v3
-    - name: 🚁 Deploy on PRE
+    - name: 🚁 Deploy on Dev
       if: ${{ github.base_ref == 'refs/heads/dev' }}
       run: |
         sudo apt-get install sshpass
         sshpass -p ${{ secrets.PRODUCTION_SERVER_PASSWORD }} ssh ${{ secrets.PRODUCTION_SERVER_USER }}@${{ secrets.PRODUCTION_SERVER_HOST}}
+        echo "${{ secrets.PRODUCTION_ENV_FILE }}" > .env
         docker kill $(docker ps -q)
         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
-        docker run ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+        docker run --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+        rm -r -f .env
     # - name: 🛫 Deploy on Staging
     #   if: ${{ github.base_ref == 'create-github-actions' }}
     #   run: # Command to deploy on STAGING environment
