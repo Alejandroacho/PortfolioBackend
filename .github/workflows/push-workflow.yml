@@ -32,7 +32,6 @@ jobs:
         tags: |
           ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPONAME}}:latest
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
-        secrets: env $(cat .env | grep -v "#" | xargs)
     - name: 🏗️ Build and push staging
       if: ${{ github.ref == 'refs/heads/staging' }}
       uses: docker/build-push-action@v3
@@ -53,7 +52,6 @@ jobs:
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
-        build-args: ${{ secrets.PRODUCTION_ENV_FILE }}
 
   Github-Versioning:
     if: ${{ github.ref == 'refs/heads/master' }}
@@ -81,26 +79,35 @@ jobs:
     - name: 🔀 Checkout
       uses: actions/checkout@v3
     - name: 🚁 Deploy on Dev
-      if: ${{ github.base_ref == 'refs/heads/dev' }}
+      if: ${{ github.ref == 'refs/heads/dev' }}
+      run: |
+        sudo apt-get install sshpass
+        sshpass -p ${{ secrets.DEV_SERVER_PASSWORD }} ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST}}
+        echo "${{ secrets.DEV_ENV_FILE }}" > .env
+        docker kill $(docker ps -q)
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+        docker run --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+        rm -r -f .env
+    - name: 🛫 Deploy on Staging
+      if: ${{ github.ref == 'refs/heads/staging' }}
+      run: |
+        sudo apt-get install sshpass
+        sshpass -p ${{ secrets.STAGING_SERVER_PASSWORD }} ssh ${{ secrets.STAGING_SERVER_USER }}@${{ secrets.STAGING_SERVER_HOST}}
+        echo "${{ secrets.STAGING_ENV_FILE }}" > .env
+        docker kill $(docker ps -q)
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
+        docker run --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
+        rm -r -f .env
+    - name: 🚀 Deploy on Production
+      if: ${{ github.ref == 'refs/heads/master' }}
       run: |
         sudo apt-get install sshpass
         sshpass -p ${{ secrets.PRODUCTION_SERVER_PASSWORD }} ssh ${{ secrets.PRODUCTION_SERVER_USER }}@${{ secrets.PRODUCTION_SERVER_HOST}}
         echo "${{ secrets.PRODUCTION_ENV_FILE }}" > .env
         docker kill $(docker ps -q)
-        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
-        docker run --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
+        docker run --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
         rm -r -f .env
-    # - name: 🛫 Deploy on Staging
-    #   if: ${{ github.base_ref == 'create-github-actions' }}
-    #   run: # Command to deploy on STAGING environment
-    # - name: 🚀 Deploy on Production
-    #   if: ${{ github.base_ref == 'refs/heads/master' }}
-    #   run: |
-    #     sudo apt-get install sshpass
-    #     sshpass -p ${{ secrets.PRODUCTION_SERVER_PASSWORD }} ssh ${{ secrets.PRODUCTION_SERVER_USER }}@${{ secrets.PRODUCTION_SERVER_HOST}}
-    #     docker kill $(docker ps -q)
-    #     docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
-    #     docker run ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
 
   Done:
     needs: [Deploy]
