@@ -82,7 +82,7 @@ jobs:
       if: ${{ github.ref == 'refs/heads/dev' }}
       run: |
         sudo apt-get install sshpass
-        sshpass -p ${{ secrets.DEV_SERVER_PASSWORD }} ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST}}
+        /usr/local/bin/sshpass -p ${{ secrets.DEV_SERVER_PASSWORD }} ssh ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST}}
         echo "${{ secrets.DEV_ENV_FILE }}" > .env
         docker kill $(docker ps -q)
         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
@@ -92,7 +92,7 @@ jobs:
       if: ${{ github.ref == 'refs/heads/staging' }}
       run: |
         sudo apt-get install sshpass
-        sshpass -p ${{ secrets.STAGING_SERVER_PASSWORD }} ssh ${{ secrets.STAGING_SERVER_USER }}@${{ secrets.STAGING_SERVER_HOST}}
+        /usr/local/bin/sshpass -p ${{ secrets.STAGING_SERVER_PASSWORD }} ssh ${{ secrets.STAGING_SERVER_USER }}@${{ secrets.STAGING_SERVER_HOST}}
         echo "${{ secrets.STAGING_ENV_FILE }}" > .env
         docker kill $(docker ps -q)
         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
@@ -102,7 +102,7 @@ jobs:
       if: ${{ github.ref == 'refs/heads/master' }}
       run: |
         sudo apt-get install sshpass
-        sshpass -p ${{ secrets.PRODUCTION_SERVER_PASSWORD }} ssh ${{ secrets.PRODUCTION_SERVER_USER }}@${{ secrets.PRODUCTION_SERVER_HOST}}
+        /usr/local/bin/sshpass -p ${{ secrets.PRODUCTION_SERVER_PASSWORD }} ssh ${{ secrets.PRODUCTION_SERVER_USER }}@${{ secrets.PRODUCTION_SERVER_HOST}}
         echo "${{ secrets.PRODUCTION_ENV_FILE }}" > .env
         docker kill $(docker ps -q)
         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
