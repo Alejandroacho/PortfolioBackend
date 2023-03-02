@@ -59,7 +59,7 @@ jobs:
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
-        build-args: echo $(cat .env | grep -v "#" | xargs)
+        build-args: cat .env
 
   Github-Versioning:
     if: ${{ github.ref == 'refs/heads/master' }}
