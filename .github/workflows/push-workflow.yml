@@ -46,9 +46,9 @@ jobs:
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
-    - name: 🏗️ Create ENV file for master
-      if: ${{ github.ref == 'refs/heads/dev' }}
-      run: echo "${{ secrets.PRODUCTION_ENV_FILE }}" > .env
+    # - name: 🏗️ Create ENV file for master
+    #   if: ${{ github.ref == 'refs/heads/dev' }}
+    #   run: echo "${{ secrets.PRODUCTION_ENV_FILE }}" > .env
     - name: 🏗️ Build and push dev
       if: ${{ github.ref == 'refs/heads/dev' }}
       uses: docker/build-push-action@v3
@@ -59,7 +59,7 @@ jobs:
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:${{ github.sha }}
-        build-args: cat .env
+        build-args: ${{ secrets.PRODUCTION_ENV_FILE }}
 
   Github-Versioning:
     if: ${{ github.ref == 'refs/heads/master' }}
