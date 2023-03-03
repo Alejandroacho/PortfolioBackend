@@ -1,4 +1,4 @@
-name: Versioning workflow
+name: CD workflow
 
 on:
   push:
@@ -79,7 +79,7 @@ jobs:
     - name: 🔀 Checkout
       uses: actions/checkout@v3
     - name: 🚁 Deploy on Dev
-      uses: matheusvanzan/sshpass-action@v1
+      uses: matheusvanzan/sshpass-action@v2
       if: ${{ github.ref == 'refs/heads/dev' }}
       with:
         host: ${{ secrets.DEV_SERVER_HOST }}
@@ -92,7 +92,7 @@ jobs:
           docker run --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
           rm -r -f .env
     - name: 🛫 Deploy on Staging
-      uses: matheusvanzan/sshpass-action@v1
+      uses: matheusvanzan/sshpass-action@v2
       if: ${{ github.ref == 'refs/heads/staging' }}
       with:
         host: ${{ secrets.STAGING_SERVER_HOST }}
@@ -105,7 +105,7 @@ jobs:
           docker run --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
           rm -r -f .env
     - name: 🚀 Deploy on Production
-      uses: matheusvanzan/sshpass-action@v1
+      uses: matheusvanzan/sshpass-action@v2
       if: ${{ github.ref == 'refs/heads/master' }}
       with:
         host: ${{ secrets.PRODUCTION_SERVER_HOST }}
