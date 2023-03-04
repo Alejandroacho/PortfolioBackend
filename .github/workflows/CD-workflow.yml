@@ -87,13 +87,9 @@ jobs:
         pass: ${{ secrets.DEV_SERVER_PASSWORD }}
         run: |
           echo "${{ secrets.DEV_ENV_FILE }}" > .env
-          echo $(pwd)
-          echo $(ls -a)
-          echo $(ls -l .env)
           docker kill $(docker ps -q)
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
           docker run --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
-          rm -r -f .env
     - name: 🛫 Deploy on Staging
       uses: matheusvanzan/sshpass-action@v2
       if: ${{ github.ref == 'refs/heads/staging' }}
