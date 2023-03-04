@@ -89,7 +89,7 @@ jobs:
           echo "${{ secrets.DEV_ENV_FILE }}" > variables.env
           docker kill $(docker ps -q)
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
-          docker run --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+          docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
           rm -r -f variables.env
     - name: 🛫 Deploy on Staging
       uses: matheusvanzan/sshpass-action@v2
@@ -102,7 +102,7 @@ jobs:
           echo "${{ secrets.STAGING_ENV_FILE }}" > variables.env
           docker kill $(docker ps -q)
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
-          docker run --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
+          docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
           rm -r -f variables.env
     - name: 🚀 Deploy on Production
       uses: matheusvanzan/sshpass-action@v2
@@ -115,7 +115,7 @@ jobs:
           echo "${{ secrets.PRODUCTION_ENV_FILE }}" > variables.env
           docker kill $(docker ps -q)
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
-          docker run --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
+          docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
           rm -r -f variables.env
 
   Done:
