@@ -87,7 +87,7 @@ jobs:
         pass: ${{ secrets.DEV_SERVER_PASSWORD }}
         run: |
           echo "${{ secrets.DEV_ENV_FILE }}" > variables.env
-          docker kill $(docker ps -q)
+          docker stop $(docker ps -aqf "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest")
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
           docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
           rm -r -f variables.env
@@ -100,7 +100,7 @@ jobs:
         pass: ${{ secrets.STAGING_SERVER_PASSWORD }}
         run: |
           echo "${{ secrets.STAGING_ENV_FILE }}" > variables.env
-          docker kill $(docker ps -q)
+          docker stop $(docker ps -aqf "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest")
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
           docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
           rm -r -f variables.env
@@ -113,7 +113,7 @@ jobs:
         pass: ${{ secrets.PRODUCTION_SERVER_PASSWORD }}
         run: |
           echo "${{ secrets.PRODUCTION_ENV_FILE }}" > variables.env
-          docker kill $(docker ps -q)
+          docker stop $(docker ps -aqf "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest")
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
           docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
           rm -r -f variables.env
