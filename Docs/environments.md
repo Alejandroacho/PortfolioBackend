@@ -153,133 +153,133 @@ In order to make this as easy as possible (takin in mind that you may have more 
 ######################################
 # PROJECT
 ######################################
-DO_TOKEN = ""
-SECRET_KEY = ""
-TEST_EMAI = ""
-SUGGESTIONS_EMAIL = ""
-TRAEFIK_USER = ""
-TRAEFIK_PASSWORD = ""
-EMAIL_VERIFICATION_TOKEN_SECRET = ""
-SERVER_IP = ""
-ENV = Production
+DO_TOKEN=""
+SECRET_KEY=""
+TEST_EMAIL=""
+SUGGESTIONS_EMAIL=""
+TRAEFIK_USER=""
+TRAEFIK_PASSWORD=""
+EMAIL_VERIFICATION_TOKEN_SECRET=""
+SERVER_IP=""
+ENV=Production
 
 
 ######################################
 # DATABASE
 ######################################
-DB_NAME = ""
-DB_USER = ""
-DB_PASSWORD = ""
-DB_HOST = ""
-DB_PORT = ""
+DB_NAME=""
+DB_USER=""
+DB_PASSWORD=""
+DB_HOST=""
+DB_PORT=""
 
 
 ######################################
 # URLS
 ######################################
-FRONTEND_URL = ""
-PROJECT_URL = domain.com
-BACKEND_URL = subdomainexample.domain.com
-TRAEFIK_UR = ""
-GRAFANA_URL = ""
-PROMETHEUS_URL = ""
-RABBIT_URL = ""
-FLOWER_URL = ""
-VERIFY_URL = ""
+FRONTEND_URL=""
+PROJECT_URL=domain.com
+BACKEND_URL=subdomainexample.domain.com
+TRAEFIK_UR=""
+GRAFANA_URL=""
+PROMETHEUS_URL=""
+RABBIT_URL=""
+FLOWER_URL=""
+VERIFY_URL=""
 
 
 ######################################
 # Django
 ######################################
-DJANGO_SETTINGS_MODULE = Envs.Production.django_settings
+DJANGO_SETTINGS_MODULE=Envs.${ENV}.django_settings
 
 
 ######################################
 # SMTP
 ######################################
-EMAIL_HOST = ""
-EMAIL_HOST_USER = ""
-EMAIL_HOST_PASSWORD = ""
-EMAIL_PORT = ""
+EMAIL_HOST=""
+EMAIL_HOST_USER=""
+EMAIL_HOST_PASSWORD=""
+EMAIL_PORT=""
 
 
 ######################################
 # OAUTH
 ######################################
-GOOGLE_CLIENT_ID = ""
-GOOGLE_CLIENT_SECRET = ""
-TWITTER_API_KEY = ""
-TWITTER_API_SECRET_KEY = ""
-TWITTER_API_BEARER_TOKEN = ""
-OAUTH_PASSWORD = ""
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+TWITTER_API_KEY=""
+TWITTER_API_SECRET_KEY=""
+TWITTER_API_BEARER_TOKEN=""
+OAUTH_PASSWORD=""
 
 
 ######################################
 # S3
 ######################################
-AWS_STORAGE_IMAGE_BUCKET_NAME = ""
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
-AWS_S3_REGION_NAME = ""
-AWS_S3_SIGNATURE_VERSION = ""
+AWS_STORAGE_IMAGE_BUCKET_NAME=""
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
+AWS_S3_REGION_NAME=""
+AWS_S3_SIGNATURE_VERSION=""
 
 
 ######################################
 # Rabbit MQ
 ######################################
-RABBITMQ_DEFAULT_USER = ""
-RABBITMQ_DEFAULT_PASS = ""
+RABBITMQ_DEFAULT_USER=""
+RABBITMQ_DEFAULT_PASS=""
 
 
 ######################################
 # Celery
 ######################################
-export CELERY_BROKER = amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+export CELERY_BROKER=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
 
 
 ######################################
 # Flower
 ######################################
-FLOWER_BROKER = amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+FLOWER_BROKER=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
 
 
 ######################################
 # System
 ######################################
-PYTHONDONTWRITEBYTECODE = 1
+PYTHONDONTWRITEBYTECODE=1
 
 
 ######################################
 # Images
 ######################################
-FLOWER = zoomeranalytics/flower:0.9.2-4.0.2-2
-RABBIT = rabbitmq:3.9.21
-GRAFANA = grafana/grafana:9.0.3
-PROMETHEUS = prom/prometheus:v2.37.0
-TRAEFIK = traefik:v2.3
+FLOWER=zoomeranalytics/flower:0.9.2-4.0.2-2
+RABBIT=rabbitmq:3.9.21
+GRAFANA=grafana/grafana:9.0.3
+PROMETHEUS=prom/prometheus:v2.37.0
+TRAEFIK=traefik:v2.3
 
 
 ######################################
 # Docker compose environment Variables
 ######################################
-APP_NAME = Portfolio
+APP_NAME=Portfolio
 
 
 ######################################
 # Paths
 ######################################
-DATA_FOLDER = ~/.mdbdata/${APP_NAME}
-DOCKERFILE_PATH = ./Envs/Production/Dockerfile
-CELERY_PATH = Project.settings.celery_worker.app
-PROMETHEUS_YML = ../../Project/settings/prometheus.yml
+DATA_FOLDER=~/.mdbdata/${APP_NAME}
+DOCKERFILE_PATH=./Envs/Production/Dockerfile
+CELERY_PATH=Project.settings.celery_worker.app
+PROMETHEUS_YML=../../Project/settings/prometheus.yml
 
 
 ######################################
 # Commands
 ######################################
-START_DJANGO = python3 manage.py runserver 0.0.0.0:8000
-START_CELERY_WORKER = celery --app=${CELERY_PATH} worker --concurrency=1 --hostname=worker@%h --loglevel=INFO
-START_CELERY_BEAT = python3 -m celery --app=${CELERY_PATH} beat -l debug -f /var/log/App-celery-beat.log --pidfile=/tmp/celery-beat.pid
+START_DJANGO=python3 manage.py runserver 0.0.0.0:8000
+START_CELERY_WORKER=celery --app=${CELERY_PATH} worker --concurrency=1 --hostname=worker@%h --loglevel=INFO
+START_CELERY_BEAT=python3 -m celery --app=${CELERY_PATH} beat -l debug -f /var/log/App-celery-beat.log --pidfile=/tmp/celery-beat.pid
 
 ````
 

@@ -8,6 +8,7 @@ You can check the official documentation [here](https://pre-commit.com/).
 1. Via pip, run:
 
     `pip install pre-commit`
+
 2. On macOS, run:
 
     `brew install pre-commit`.
