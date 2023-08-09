@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, "Apps"))
 
 
 # Applications definition
-APP_NAME: str = "APPNAME"
+APP_NAME: str = "Portfolio"
 URL: str = ""
 FRONTEND_URL: str = ""
 
@@ -53,14 +53,12 @@ LOCAL_APPS: list = [
     "Envs",
     "Project",
     "Users",
-    "Emails",
     "Technologies",
     "SocialNetworks",
     "Images",
     "Certifications",
     "Authors",
     "Projects",
-    "Maintainers",
 ]
 
 INSTALLED_APPS: list = (
@@ -98,16 +96,6 @@ REST_FRAMEWORK: dict = {
         "rest_framework_simplejwt.authentication.JWTAuthentication"
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-SPECTACULAR_SETTINGS: dict = {
-    "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead
-    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
-    "REDOC_DIST": "SIDECAR",
-    "TITLE": "Your Project API",
-    "DESCRIPTION": "Your project description",
-    "VERSION": "1.0.0",
-    "SCHEMA_PATH_PREFIX": r"/api/",
 }
 
 ROOT_URLCONF: str = "Project.urls"
@@ -201,6 +189,17 @@ TEMPLATES: list = [
 ]
 LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 
+
+SPECTACULAR_SETTINGS: dict = {
+    "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead
+    "SWAGGER_UI_FAVICON_HREF": STATIC_URL + "favicon.ico",
+    "REDOC_DIST": "SIDECAR",
+    "TITLE": "Portfolio API",
+    "DESCRIPTION": "Alejandro Acho Portfolio",
+    "VERSION": "1.0.0",
+    "SCHEMA_PATH_PREFIX": r"/api/",
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -211,39 +210,6 @@ CELERY_TIMEZONE: str = TIME_ZONE
 CELERY_TASK_TRACK_STARTED: bool = True
 CELERY_TASK_TIME_LIMIT: int = 30 * 60
 
-# Global email settings
-EMAIL_GREETING: str = _("Hi,")
-FOLLOW_TEXT: str = _("Follow Us")
-UNSUBSCRIBE_TEXT: str = _("Click here to unsubscribe.")
-
-# Suggestion email settings
-SUGGESTIONS_EMAIL: str = ""
-SUGGESTIONS_EMAIL_HEADER: str = "from user with id:"
-SUGGESTIONS_EMAIL_LINK_TEXT: str = "Mark as read"
-
-# Reset email settings
-RESET_PASSWORD_EMAIL_SUBJECT: str = _("Reset your password")
-RESET_PASSWORD_EMAIL_HEADER: str = _("Reset your password")
-RESET_PASSWORD_EMAIL_LINK_TEXT: str = _("Click here to reset your password")
-RESET_PASSWORD_EMAIL_CONTENT: str = _(
-    "Click in the link below to change your password."
-)
-RESET_PASSWORD_EMAIL_LINK_TEXT: str = _("Reset password")
-RESET_PASSWORD_URL: str = f""  # Must redirect a front url with the token in url
-
-# Verify email settings
-VERIFY_EMAIL_SUBJECT: str = _("Verify your email")
-VERIFY_EMAIL_HEADER: str = _("Welcome to ")
-VERIFY_EMAIL_LINK_TEXT: str = _("Click here to reset your password")
-VERIFY_EMAIL_CONTENT: str = _(
-    "First of all we want to thank you to give us a chance! "
-    + "To fully start using the app and begin to be part "
-    + "of the community, you must verify your email clicking "
-    + "on the button below."
-)
-VERIFY_EMAIL_LINK_TEXT: str = _("Verify email")
-VERIFY_EMAIL_URL: str = f"{URL}/api/users"
-
 ## Storage
 DEFAULT_FILE_STORAGE: str = "django.core.files.storage.FileSystemStorage"
 # AWS
@@ -253,17 +219,6 @@ AWS_STORAGE_IMAGE_BUCKET_NAME: str = None
 AWS_SECRET_ACCESS_KEY: str = None
 AWS_S3_REGION_NAME: str = None
 AWS_S3_SIGNATURE_VERSION: str = None
-
-## SOCIAL OAUTH
-# Google
-GOOGLE_CLIENT_ID: str = None
-GOOGLE_CLIENT_SECRET: str = None
-# Twitter
-TWITTER_API_KEY: str = None
-TWITTER_API_SECRET_KEY: str = None
-TWITTER_API_BEARER_TOKEN: str = None
-# OAUTH SETTINGS
-OAUTH_PASSWORD: str = None
 
 
 ## Maintainers limit

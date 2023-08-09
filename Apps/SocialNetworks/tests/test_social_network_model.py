@@ -10,7 +10,7 @@ class TestSocialNetworkModel:
     def test_model_keys(self) -> None:
         social_network: SocialNetwork = SocialNetworkFaker()
         assert hasattr(social_network, "id")
-        assert hasattr(social_network, "platform")
+        assert hasattr(social_network, "social_network_platform")
         assert hasattr(social_network, "nickname")
         assert hasattr(social_network, "url")
 
@@ -19,7 +19,7 @@ class TestSocialNetworkModel:
         assert (
             str(social_network)
             == f"{social_network.id} | {social_network.nickname}"
-            + f" - {social_network.platform}"
+            + f" - {social_network.social_network_platform}"
         )
 
 
@@ -28,7 +28,7 @@ class TestSocialNetworkFactory:
     def test_factory_creates_an_instance(self) -> None:
         assert SocialNetwork.objects.count() == 0
         social_network: SocialNetwork = SocialNetworkFactory(
-            platform="TIKTOK",
+            social_network_platform="TIKTOK",
             nickname="User",
             url="https://www.tiktok.com/@user",
         )
@@ -44,5 +44,5 @@ class TestSocialNetworkFaker:
         assert isinstance(social_network, SocialNetwork)
         assert SocialNetwork.objects.count() == 1
         assert social_network.nickname == "Username"
-        assert social_network.platform == "LINKEDIN"
+        assert social_network.social_network_platform == "LINKEDIN"
         assert social_network.url == "https://www.linkedin.com/in/username/"

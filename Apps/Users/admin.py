@@ -7,7 +7,6 @@ from django.contrib.auth.models import Group
 from django.utils.html import format_html
 from django_rest_passwordreset.models import ResetPasswordToken
 
-from Users.models import Profile
 from Users.models import User
 
 
@@ -34,75 +33,31 @@ admin.site.unregister(ResetPasswordToken)
 
 
 class UserAdmin(BaseUserAdmin):
-    # The fields to be used in displaying the User model.
-    # These override the definitions on the base UserAdmin
-    # that reference specific fields on auth.User.
-    list_display: tuple = (
-        "id",
-        "email",
-        "first_name",
-        "is_verified",
-        "is_premium",
-    )
-    list_display_links: tuple = ("id", "email")
-    list_filter: tuple = ("is_admin", "is_verified", "is_premium")
+    list_display: tuple = ("id", "first_name", "last_name", "email")
+    list_display_links: tuple = ("id", "first_name")
+    list_filter: tuple = ("first_name", "last_name", "email")
     fieldsets: tuple = (
-        ("General", {"fields": ("id", "email", "password")}),
         (
-            "Personal info",
+            "Overview",
             {
                 "fields": (
+                    "id",
                     "first_name",
                     "last_name",
-                    "phone_number",
-                    "gender",
-                    "preferred_language",
-                    "birth_date",
+                    "email",
+                    "about",
+                    "cv",
+                    "certifications",
+                    "images",
+                    "social_networks",
+                    "author",
                 )
             },
         ),
-        (
-            "Account status",
-            {"fields": ("is_verified", "is_premium", "auth_provider")},
-        ),
-        ("Permissions", {"fields": ("is_admin",)}),
-        ("Dates", {"fields": ("created_at", "updated_at")}),
     )
-    readonly_fields: list = ["created_at", "updated_at", "id"]
-    # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
-    # overrides get_fieldsets to use this attribute when creating a user.
-    add_fieldsets: tuple = (
-        (
-            "General",
-            {
-                "classes": ("wide",),
-                "fields": (
-                    "email",
-                    "first_name",
-                    "last_name",
-                    "password1",
-                    "password2",
-                ),
-            },
-        ),
-    )
-    search_fields: tuple = ("email", "id")
-    ordering: tuple = ("id", "email", "first_name")
-    filter_horizontal: tuple = ()
-
-
-class ProfileAdmin(ModelAdmin):
-    list_display: tuple = ("user", "nickname")
-    list_display_links: tuple = (
-        "user",
-        "nickname",
-    )
-    fieldsets: tuple = (
-        ("User", {"fields": ("user",)}),
-        ("Account info", {"fields": ("nickname", "bio", "image")}),
-    )
-    search_fields: tuple = ("nickname", "id")
-    ordering: tuple = ("user", "nickname")
+    ordering: list = ("id",)
+    readonly_fields: list = ["id"]
+    search_fields: tuple = ("email", "last_name", "first_name", "id")
 
 
 class LogEntryAdmin(ModelAdmin):
@@ -119,4 +74,3 @@ class LogEntryAdmin(ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(LogEntry, LogEntryAdmin)
-admin.site.register(Profile, ProfileAdmin)

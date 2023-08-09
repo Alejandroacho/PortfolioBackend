@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "type",
+                    "image_type",
                     models.CharField(
                         choices=[
                             ("PC", "Pc"),

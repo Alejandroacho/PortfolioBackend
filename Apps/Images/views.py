@@ -1,15 +1,14 @@
 from django.db.models import QuerySet
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
+from drf_spectacular.utils import extend_schema_view, extend_schema
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from Images.models import Image
 from Images.serializers import ImageSerializer
-from Users.permissions import IsAdmin
-from Users.permissions import IsVerified
 
 
-class ImageViewSet(ModelViewSet):
+@extend_schema_view(list=extend_schema(description='Get all Images'))
+class ImageViewSet(ReadOnlyModelViewSet):
     queryset: QuerySet = Image.objects.all().order_by("-id")
     lookup_url_kwarg: str = "pk"
     serializer_class: ImageSerializer = ImageSerializer
-    permission_classes: list = [IsAuthenticated & IsVerified & IsAdmin]
+

@@ -7,10 +7,6 @@ from django.core.management.base import CommandParser
 from tqdm import tqdm
 from tqdm import trange as progress
 
-from Emails.choices import CommentType
-from Emails.factories.email import VerifyEmailFactory
-from Emails.factories.suggestion import SuggestionEmailFactory
-from Users.factories.profile import ProfileFactory
 from Users.fakers.user import AdminFaker
 from Users.fakers.user import UserFaker
 from Users.models import User
@@ -32,8 +28,8 @@ class Command(BaseCommand):
 
     def handle(self, *args: tuple, **options: dict) -> None:
         if settings.ENVIRONMENT_NAME in ["dev", "local", "test"]:
-            instances_number: int = options["instances"]
-            create_admin: bool = options["admin"]
+            instances_number: int = int(options["instances"])
+            create_admin: bool = bool(options["admin"])
             self.populate(instances_number, create_admin)
         else:
             logger.critical(
@@ -43,9 +39,6 @@ class Command(BaseCommand):
 
     def populate(self, instances_number: int, create_admin: bool) -> None:
         users: list = self.create_fake_users(instances_number)
-        self.create_fake_verify_emails(users)
-        self.create_fake_profiles(users)
-        self.create_fake_suggestions(users)
         if create_admin:
             self.create_admin_user()
 
@@ -57,32 +50,6 @@ class Command(BaseCommand):
             users.append(user)
         self.stdout.write("Fake users created")
         return users
-
-    def create_fake_verify_emails(self, users: list) -> None:
-        self.stdout.write("Creating fake verify emails")
-        with tqdm(total=len(users)) as progress_bar:
-            for user in users:
-                VerifyEmailFactory(instance=user)
-                progress_bar.update(1)
-        self.stdout.write("Fake verify emails created")
-
-    def create_fake_profiles(self, users: list) -> None:
-        self.stdout.write("Creating fake profiles")
-        with tqdm(total=len(users)) as progress_bar:
-            for user in users:
-                ProfileFactory(user=user)
-                progress_bar.update(1)
-        self.stdout.write("Fake profiles created")
-
-    def create_fake_suggestions(self, users: list) -> None:
-        self.stdout.write("Creating fake suggestions")
-        type: str = CommentType.SUGGESTION.value
-        content: str = "This is a fake suggestion"
-        with tqdm(total=len(users)) as progress_bar:
-            for user in users:
-                SuggestionEmailFactory(type=type, content=content, user=user)
-                progress_bar.update(1)
-        self.stdout.write("Fake profiles created")
 
     def create_admin_user(self) -> None:
         self.stdout.write("Creating admin user")

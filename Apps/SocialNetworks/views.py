@@ -1,15 +1,11 @@
 from django.db.models import QuerySet
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from SocialNetworks.models import SocialNetwork
 from SocialNetworks.serializers import SocialNetworkSerializer
-from Users.permissions import IsAdmin
-from Users.permissions import IsVerified
 
 
-class SocialNetworkViewSet(ModelViewSet):
+class SocialNetworkViewSet(ReadOnlyModelViewSet):
     queryset: QuerySet = SocialNetwork.objects.all().order_by("-id")
     lookup_url_kwarg: str = "pk"
     serializer_class: SocialNetworkSerializer = SocialNetworkSerializer
-    permission_classes: list = [IsAuthenticated & IsVerified & IsAdmin]

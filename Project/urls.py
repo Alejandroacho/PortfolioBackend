@@ -21,7 +21,6 @@ urlpatterns: list = [
     path("jet/dashboard/", include("jet.dashboard.urls", "jet-dashboard")),
     path("admin/", admin.site.urls),
     path("api/", include(("Users.urls", "users"), namespace="users")),
-    path("api/", include(("Emails.urls", "emails"), namespace="emails")),
     path(
         "api/",
         include(
@@ -49,27 +48,8 @@ urlpatterns: list = [
             namespace="certifications",
         ),
     ),
-    path(
-        "api/",
-        include(
-            ("Maintainers.urls", "maintainers"),
-            namespace="maintainers",
-        ),
-    ),
     path("api/", include(("Authors.urls", "authors"), namespace="authors")),
     path("api/", include(("Projects.urls", "projects"), namespace="projects")),
-    path(
-        "api/oauth/", include(("Users.OAuth.urls", "oauth"), namespace="oauth")
-    ),
-    path("api/", include(("Users.Auth.urls", "auth"), namespace="auth")),
-    path(
-        "api/reset_password/",
-        include("django_rest_passwordreset.urls", namespace="password_reset"),
-    ),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path(
-        "api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
-    ),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "docs/swagger/",

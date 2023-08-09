@@ -37,14 +37,14 @@ class TestCreateEndpoint:
         response: Response = client.post(
             self.url(),
             data={
-                "platform": "NON_EXISTENT",
+                "social_network_platform": "NON_EXISTENT",
                 "nickname": "User",
                 "url": "https://www.blabla.com/user/",
             },
         )
         assert response.status_code == 400
         assert '"NON_EXISTENT" is not a valid choice.' in str(
-            response.data["platform"][0]
+            response.data["social_network_platform"][0]
         )
 
     def test_works_as_admin(self) -> None:
@@ -55,7 +55,7 @@ class TestCreateEndpoint:
         response: Response = client.post(
             self.url(),
             data={
-                "platform": "LINKEDIN",
+                "social_network_platform": "LINKEDIN",
                 "nickname": "User",
                 "url": "https://www.linkedin.com/in/user/",
             },
@@ -67,7 +67,7 @@ class TestCreateEndpoint:
             SocialNetwork.objects.first().url
             == "https://www.linkedin.com/in/user/"
         )
-        assert SocialNetwork.objects.first().platform == "LINKEDIN"
+        assert SocialNetwork.objects.first().social_network_platform == "LINKEDIN"
 
 
 @pytest.mark.django_db
@@ -160,14 +160,14 @@ class TestUpdateEndpoint:
         response: Response = client.patch(
             self.url(social_network.id),
             data={
-                "platform": "NON_EXISTENT",
+                "social_network_platform": "NON_EXISTENT",
                 "nickname": "User",
                 "url": "https://www.blabla.com/user/",
             },
         )
         assert response.status_code == 400
         assert '"NON_EXISTENT" is not a valid choice.' in str(
-            response.data["platform"][0]
+            response.data["social_network_platform"][0]
         )
 
     def test_works_as_admin(self) -> None:
@@ -176,16 +176,16 @@ class TestUpdateEndpoint:
         client: APIClient = APIClient()
         client.force_authenticate(user)
         assert SocialNetwork.objects.count() == 1
-        assert SocialNetwork.objects.first().platform == "LINKEDIN"
-        assert SocialNetwork.objects.first().nickname == "Username"
+        assert SocialNetwork.objects.first().social_network_platform == "LINKEDIN"
+        assert SocialNetwork.objects.first().social_network_platform == "Username"
         response: Response = client.patch(
             self.url(social_network.id),
-            data={"platform": "TIKTOK", "nickname": "Nickname"},
+            data={"social_network_platform": "TIKTOK", "nickname": "Nickname"},
         )
         assert response.status_code == 200
         assert SocialNetwork.objects.count() == 1
-        assert SocialNetwork.objects.first().platform == "TIKTOK"
-        assert SocialNetwork.objects.first().nickname == "Nickname"
+        assert SocialNetwork.objects.first().social_network_platform == "TIKTOK"
+        assert SocialNetwork.objects.first().social_network_platform == "Nickname"
 
 
 @pytest.mark.django_db

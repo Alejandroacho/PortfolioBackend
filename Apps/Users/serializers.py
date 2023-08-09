@@ -1,168 +1,105 @@
-from django.contrib.auth import password_validation
-from django.db.models import Field
 from django.db.models import Model
-from django.db.models import QuerySet
-from drf_extra_fields.fields import Base64ImageField
-from phonenumber_field.serializerfields import PhoneNumberField
-from rest_framework.relations import RelatedField
-from rest_framework.serializers import BooleanField
-from rest_framework.serializers import CharField
-from rest_framework.serializers import DateTimeField
-from rest_framework.serializers import EmailField
-from rest_framework.serializers import IntegerField
+from drf_extra_fields.fields import Base64FileField
+from filetype import guess as guess_file_extension
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import ModelSerializer
-from rest_framework.serializers import PrimaryKeyRelatedField
-from rest_framework.serializers import Serializer
-from rest_framework.serializers import ValidationError
 
-from Users.models import Profile
+from Authors.models import Author
+from Authors.serializers import AuthorSerializer
+from Certifications.models import Certification
+from Certifications.serializers import CertificationSerializer
+from Images.models import Image
+from Images.serializers import ImageSerializer
+from SocialNetworks.models import SocialNetwork
+from SocialNetworks.serializers import SocialNetworkSerializer
 from Users.models import User
-from Users.utils import check_e164_format
 
 
-class UserRetrieveSerializer(Serializer):
-    """
-    User authentication serializer
-    """
+class CustomFileField(Base64FileField):
+    ALLOWED_TYPES: list = [
+        "pdf",
+    ]
 
-    id: Field = IntegerField(read_only=True)
-    first_name: Field = CharField(required=False, max_length=255)
-    last_name: Field = CharField(required=False, max_length=255)
-    email: Field = EmailField(required=True)
-    phone_number: PhoneNumberField = PhoneNumberField(
-        required=False, max_length=22
-    )
-    is_verified: Field = BooleanField(read_only=True)
-    is_premium: Field = BooleanField(read_only=True)
-    is_admin: Field = BooleanField(read_only=True)
-    created_at: Field = DateTimeField(read_only=True)
-    updated_at: Field = DateTimeField(read_only=True)
+    def get_file_extension(self, _, decoded_file) -> str:
+        return guess_file_extension(decoded_file).extension
+
+
+class UserSerializer(ModelSerializer):
+    cv = CustomFileField(required=False, allow_null=True)
+    social_networks = SocialNetworkSerializer(many=True)
+    certifications = CertificationSerializer(many=True)
+    images = ImageSerializer(many=True)
+    author = AuthorSerializer()
 
     class Meta:
         model: Model = User
+        fields: str = "__all__"
+        read_only_fields: list = ["id"]
+        allow_empty_fields: list = [
+            "social_networks",
+            "certifications",
+            "images",
+            "cv",
+        ]
 
+    def to_representation(self, instance: User) -> dict:
+        return {
+            "id": instance.id,
+            "first_name": instance.first_name,
+            "last_name": instance.last_name,
+            "email": instance.email,
+            "about": instance.about,
+            "cv": instance.cv.url if instance.cv else None,
+            "certifications": CertificationSerializer(
+                instance.certifications.all(), many=True
+            ).data,
+            "images": ImageSerializer(instance.images.all(), many=True).data,
+            "social_networks": SocialNetworkSerializer(
+                instance.social_networks.all(), many=True
+            ).data,
+            "author": AuthorSerializer(instance.author).data,
+        }
 
-class UserUpdateSerializer(ModelSerializer):
-    """
-    User custom serializer
-    """
+    def to_internal_value(self, data: dict) -> dict:
+        return {
+            "first_name": data.get("first_name"),
+            "last_name": data.get("last_name"),
+            "email": data.get("email"),
+            "about": data.get("about"),
+            "cv": CustomFileField().to_internal_value(data.get("cv", None)),
+            "certifications": Certification.objects.filter(
+                id__in=data.pop("certifications", [])
+            ),
+            "images": Image.objects.filter(id__in=data.pop("images", [])),
+            "social_networks": SocialNetwork.objects.filter(
+                id__in=data.pop("social_networks", [])
+            ),
+            "author": Author.objects.filter(
+                id=data.pop("author", None)
+            ).first(),
+        }
 
-    first_name: Field = CharField(required=False, max_length=255)
-    last_name: Field = CharField(required=False, max_length=255)
-    email: Field = EmailField(required=False)
-    phone_number: CharField = CharField(
-        required=False,
-        max_length=22,
-        allow_blank=True,
-        allow_null=True,
-    )
-    old_password: Field = CharField(
-        write_only=True, required=False, allow_null=True, allow_blank=True
-    )
-    password: Field = CharField(
-        write_only=True, required=False, allow_null=True, allow_blank=True
-    )
+    def create(self, validated_data: dict) -> User:
+        certifications = validated_data.pop("certifications")
+        images = validated_data.pop("images")
+        social_networks = validated_data.pop("social_networks")
+        try:
+            maintainer = Maintainer.objects.create(**validated_data)
+        except ValueError as error:
+            raise PermissionDenied(error)
+        maintainer.certifications.set(certifications)
+        maintainer.images.set(images)
+        maintainer.social_networks.set(social_networks)
+        return maintainer
 
     def update(self, instance: User, validated_data: dict) -> User:
-        password: str = validated_data.pop("password", None)
-        instance = super().update(instance, validated_data)
-        if password:
-            instance.set_password(password)
-            instance.save()
+        certifications = validated_data.pop("certifications")
+        images = validated_data.pop("images")
+        social_networks = validated_data.pop("social_networks")
+        for attribute, value in validated_data.items():
+            setattr(instance, attribute, value or getattr(instance, attribute))
+        instance.social_networks.set(social_networks)
+        instance.certifications.set(certifications)
+        instance.images.set(images)
+        instance.save()
         return instance
-
-    def validate_email(self, email: str) -> None:
-        user: User = self.context["request"].user
-        user_with_email: User = User.objects.filter(email=email).first()
-        if user_with_email and not user.has_permission(user_with_email):
-            raise ValidationError("Email is taken")
-        return email
-
-    def validate_phone_number(self, phone_number: str) -> None:
-        if not phone_number:
-            return None
-        check_e164_format(phone_number)
-        queryset: QuerySet = User.objects.filter(phone_number=phone_number)
-        user_with_phone: User = queryset.first()
-        user: User = self.context["request"].user
-        if user_with_phone and not user.has_permission(user_with_phone):
-            raise ValidationError("Phone number is taken")
-        return phone_number
-
-    def validate_password(self, password: str) -> None:
-        if not password:
-            return None
-        old_password: str = self.initial_data.get("old_password", None)
-        if not old_password:
-            raise ValidationError("Old password is required")
-        user: User = self.context["request"].user
-        if not user.is_admin and not user.check_password(old_password):
-            raise ValidationError("Wrong password")
-        password_validation.validate_password(password)
-        return password
-
-    class Meta:
-        model: Model = User
-        fields: list = [
-            "first_name",
-            "last_name",
-            "email",
-            "phone_number",
-            "old_password",
-            "password",
-        ]
-
-
-class ProfileSerializer(ModelSerializer):
-    """
-    Profile serializer
-    """
-
-    bio: CharField = CharField(
-        required=False, allow_blank=True, allow_null=True
-    )
-    nickname: CharField = CharField(
-        required=False, allow_blank=True, allow_null=True
-    )
-    image: Base64ImageField = Base64ImageField(required=False, allow_null=True)
-    user_id: RelatedField = PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user", required=False
-    )
-
-    class Meta:
-        model: Model = Profile
-        fields: list = [
-            "id",
-            "user_id",
-            "nickname",
-            "bio",
-            "image",
-        ]
-
-    def is_valid(self, raise_exception: bool = False) -> dict:
-        is_valid: dict = super().is_valid(raise_exception)
-        self.check_user_field_according_requester(self.validated_data)
-        return is_valid
-
-    def validate_nickname(self, nickname: str) -> None:
-        if nickname:
-            profile: QuerySet = Profile.objects.filter(nickname=nickname)
-            if profile.exists() and self.instance != profile.first():
-                raise ValidationError("This nickname already exists.")
-        return nickname
-
-    def check_user_field_according_requester(
-        self, validated_data: dict
-    ) -> None:
-        requester: str = self.context["request"].user
-        if not requester.is_admin:
-            self.validated_data["user"] = self.instance.user
-        else:
-            self.check_profile_with_user(validated_data)
-
-    def check_profile_with_user(self, validated_data: dict) -> None:
-        user: User or None = validated_data.get("user", None)
-        user_id: int = getattr(user, "id", None)
-        profile: QuerySet = Profile.objects.filter(user_id=user_id)
-        if profile.exists() and self.instance != profile.first():
-            raise ValidationError("User profile already exists")

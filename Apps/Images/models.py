@@ -9,7 +9,7 @@ from Project.storage import image_file_upload
 
 
 class Image(Model):
-    type: Field = CharField(
+    image_type: Field = CharField(
         max_length=100,
         null=False,
         choices=ImageTypeChoices.choices,
@@ -28,7 +28,7 @@ class Image(Model):
 
     @property
     def url(self) -> str:
-        return self.image.url
+        return self.image.url if self.image and self.image.url else ""
 
     @property
     def name(self) -> str:
