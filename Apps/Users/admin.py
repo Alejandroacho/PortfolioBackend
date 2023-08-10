@@ -47,9 +47,7 @@ class UserAdmin(BaseUserAdmin):
                     "email",
                     "about",
                     "cv",
-                    "certifications",
-                    "images",
-                    "social_networks",
+                    "image",
                     "author",
                 )
             },
