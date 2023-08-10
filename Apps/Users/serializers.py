@@ -84,7 +84,7 @@ class UserSerializer(ModelSerializer):
         images = validated_data.pop("images")
         social_networks = validated_data.pop("social_networks")
         try:
-            maintainer = Maintainer.objects.create(**validated_data)
+            maintainer = User.objects.create(**validated_data)
         except ValueError as error:
             raise PermissionDenied(error)
         maintainer.certifications.set(certifications)

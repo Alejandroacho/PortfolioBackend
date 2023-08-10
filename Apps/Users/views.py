@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from Users.models import User
@@ -13,3 +14,4 @@ class UserViewSet(ReadOnlyModelViewSet):
     queryset: QuerySet = User.objects.all()
     lookup_url_kwarg: str = "pk"
     serializer_class = UserSerializer
+    permission_classes = [AllowAny]

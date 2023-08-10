@@ -2,15 +2,15 @@ from django.db.models import Model
 from factory import post_generation
 from factory.django import DjangoModelFactory
 
-from Maintainers.models import Maintainer
+from Users.models import User
 
 
-class MaintainerFactory(DjangoModelFactory):
+class UserFactory(DjangoModelFactory):
     class Meta:
-        model: Model = Maintainer
+        model: Model = User
 
     @post_generation
-    def images(self, create: bool, extracted: Model, **kwargs: dict) -> None:
+    def images(self, create: bool, extracted: list, **kwargs: dict) -> None:
         if not create:
             return
         if extracted:
@@ -18,7 +18,7 @@ class MaintainerFactory(DjangoModelFactory):
                 self.images.add(image)
 
     @post_generation
-    def authors(self, create: bool, extracted: Model, **kwargs: dict) -> None:
+    def authors(self, create: bool, extracted: list, **kwargs: dict) -> None:
         if not create:
             return
         if extracted:
@@ -27,7 +27,7 @@ class MaintainerFactory(DjangoModelFactory):
 
     @post_generation
     def social_networks(
-        self, create: bool, extracted: Model, **kwargs: dict
+        self, create: bool, extracted: list, **kwargs: dict
     ) -> None:
         if not create:
             return
@@ -37,7 +37,7 @@ class MaintainerFactory(DjangoModelFactory):
 
     @post_generation
     def certifications(
-        self, create: bool, extracted: Model, **kwargs: dict
+        self, create: bool, extracted: list, **kwargs: dict
     ) -> None:
         if not create:
             return

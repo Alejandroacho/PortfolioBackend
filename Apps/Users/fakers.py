@@ -4,11 +4,11 @@ from factory.django import FileField
 from Authors.fakers import AuthorFaker
 from Certifications.fakers import CertificationFaker
 from Images.fakers import ImageFaker
-from Maintainers.factories import MaintainerFactory
 from SocialNetworks.fakers import SocialNetworkFaker
+from Users.factories import UserFactory
 
 
-class MaintainerFaker(MaintainerFactory):
+class UserFaker(UserFactory):
     first_name: str = "Test"
     last_name: str = "Test"
     email: str = "test@appname.com"
