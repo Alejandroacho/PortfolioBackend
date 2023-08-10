@@ -11,7 +11,7 @@ from Project.storage import document_file_upload
 from Project.storage import get_document_storage
 from Project.storage import get_image_storage
 from Project.storage import image_file_upload
-from Users.factories.user import UserFactory
+from Users.factories import UserFactory
 from Users.fakers import UserFaker
 from Users.models import User
 

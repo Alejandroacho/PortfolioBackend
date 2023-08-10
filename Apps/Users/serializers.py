@@ -6,12 +6,8 @@ from rest_framework.serializers import ModelSerializer
 
 from Authors.models import Author
 from Authors.serializers import AuthorSerializer
-from Certifications.models import Certification
-from Certifications.serializers import CertificationSerializer
 from Images.models import Image
 from Images.serializers import ImageSerializer
-from SocialNetworks.models import SocialNetwork
-from SocialNetworks.serializers import SocialNetworkSerializer
 from Users.models import User
 
 
@@ -26,9 +22,7 @@ class CustomFileField(Base64FileField):
 
 class UserSerializer(ModelSerializer):
     cv = CustomFileField(required=False, allow_null=True)
-    social_networks = SocialNetworkSerializer(many=True)
-    certifications = CertificationSerializer(many=True)
-    images = ImageSerializer(many=True)
+    image = ImageSerializer(many=True)
     author = AuthorSerializer()
 
     class Meta:
@@ -36,9 +30,7 @@ class UserSerializer(ModelSerializer):
         fields: str = "__all__"
         read_only_fields: list = ["id"]
         allow_empty_fields: list = [
-            "social_networks",
-            "certifications",
-            "images",
+            "image",
             "cv",
         ]
 
@@ -50,13 +42,7 @@ class UserSerializer(ModelSerializer):
             "email": instance.email,
             "about": instance.about,
             "cv": instance.cv.url if instance.cv else None,
-            "certifications": CertificationSerializer(
-                instance.certifications.all(), many=True
-            ).data,
-            "images": ImageSerializer(instance.images.all(), many=True).data,
-            "social_networks": SocialNetworkSerializer(
-                instance.social_networks.all(), many=True
-            ).data,
+            "image": ImageSerializer(instance.image).data,
             "author": AuthorSerializer(instance.author).data,
         }
 
@@ -67,39 +53,25 @@ class UserSerializer(ModelSerializer):
             "email": data.get("email"),
             "about": data.get("about"),
             "cv": CustomFileField().to_internal_value(data.get("cv", None)),
-            "certifications": Certification.objects.filter(
-                id__in=data.pop("certifications", [])
-            ),
-            "images": Image.objects.filter(id__in=data.pop("images", [])),
-            "social_networks": SocialNetwork.objects.filter(
-                id__in=data.pop("social_networks", [])
-            ),
+            "image": Image.objects.filter(id__in=data.pop("image", [])),
             "author": Author.objects.filter(
                 id=data.pop("author", None)
             ).first(),
         }
 
     def create(self, validated_data: dict) -> User:
-        certifications = validated_data.pop("certifications")
-        images = validated_data.pop("images")
-        social_networks = validated_data.pop("social_networks")
+        image = validated_data.pop("image")
         try:
-            maintainer = User.objects.create(**validated_data)
+            user = User.objects.create(**validated_data)
         except ValueError as error:
             raise PermissionDenied(error)
-        maintainer.certifications.set(certifications)
-        maintainer.images.set(images)
-        maintainer.social_networks.set(social_networks)
-        return maintainer
+        user.image.set(image)
+        return user
 
     def update(self, instance: User, validated_data: dict) -> User:
-        certifications = validated_data.pop("certifications")
-        images = validated_data.pop("images")
-        social_networks = validated_data.pop("social_networks")
+        image = validated_data.pop("image")
         for attribute, value in validated_data.items():
             setattr(instance, attribute, value or getattr(instance, attribute))
-        instance.social_networks.set(social_networks)
-        instance.certifications.set(certifications)
-        instance.images.set(images)
+        instance.image.set(image)
         instance.save()
         return instance
