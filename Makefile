@@ -94,7 +94,7 @@ migrations: ## Creates and applies the django migrations. *
 	@${COMMAND} "${MANAGE} makemigrations ${SETTINGS_FLAG}"
 	@${COMMAND} "${MANAGE} migrate ${SETTINGS_FLAG}"
 
-INSTANCES ?= 50
+INSTANCES ?= 10
 .PHONY: populate
 populate: ## Populates the database with dummy data. ***
 	@${COMMAND} "${MANAGE} populate_db -i $(INSTANCES) ${SETTINGS_FLAG}"

@@ -1,11 +1,13 @@
 from django.db.models import Model
-from factory import post_generation
+from factory import post_generation, PostGenerationMethodCall
 from factory.django import DjangoModelFactory
 
 from Users.models import User
 
 
 class UserFactory(DjangoModelFactory):
+    password: str = PostGenerationMethodCall("set_password", "password")
+
     class Meta:
         model: Model = User
 

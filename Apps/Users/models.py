@@ -1,12 +1,9 @@
-import datetime
 
 from django.conf import settings
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db.models import CASCADE
 from django.db.models import CharField
-from django.db.models import DateTimeField
 from django.db.models import Field
 from django.db.models import FileField
 from django.db.models import ForeignKey
@@ -18,7 +15,7 @@ from Authors.models import Author
 from Certifications.models import Certification
 from Images.models import Image
 from SocialNetworks.models import SocialNetwork
-
+from Users.manager import CustomUserManager
 
 LIMIT: int = settings.MAINTAINERS_LIMIT
 
@@ -37,20 +34,12 @@ class User(
     )
     about: Field = CharField(max_length=5000, null=False, blank=True)
     cv: Field = FileField(null=True, blank=True)
-    certifications: Field = ManyToManyField(
-        Certification,
-        related_name="certifications",
-        blank=True,
-    )
-    images: Field = ManyToManyField(
+    image: Field = ForeignKey(
         Image,
+        on_delete=CASCADE,
         related_name="images",
         blank=True,
-    )
-    social_networks: Field = ManyToManyField(
-        SocialNetwork,
-        related_name="social_networks",
-        blank=True,
+        null=True,
     )
     author: Field = ForeignKey(
         Author,
@@ -63,13 +52,33 @@ class User(
     USERNAME_FIELD: str = "email"
     REQUIRED_FIELDS: list = ["first_name", "last_name"]
 
+    objects: BaseUserManager = CustomUserManager()
+
     def __str__(self) -> str:
         return str(self.email)
 
+    @property
+    def name(self) -> str:
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def is_staff(self) -> bool:
+        return True
+
+    @staticmethod
+    def has_permission(_: Model = None) -> bool:
+        return True
+
+    def has_perm(self, permission: str, _: Model = None) -> bool:
+        return True
+
+    def has_module_perms(self, _: str) -> bool:
+        return True
+
     # There can only be a limited number of instances of this model in the DB
     def save(self, *args: tuple, **kwargs: dict) -> None:
-        maintainers_count: int = User.objects.count()
-        maintainers_ids: list = User.objects.values_list("pk", flat=True)
-        if maintainers_count == LIMIT and self.pk not in maintainers_ids:
-            raise ValueError(f"There can be only {LIMIT} Maintainer instance")
+        users_count: int = User.objects.count()
+        users_ids: list = User.objects.values_list("pk", flat=True)
+        if users_count == LIMIT and self.pk not in users_ids:
+            raise ValueError(f"There can be only {LIMIT} user instance")
         return super().save(*args, **kwargs)

@@ -5,13 +5,13 @@ from logging import Logger
 
 from django.core.management import call_command
 from django.test import override_settings
+from Emails.models import Email
+from Emails.models import Suggestion
 from pytest import fixture
 from pytest import mark
 
-from Emails.models import Email
-from Emails.models import Suggestion
 from Project.management.commands.populate_db import Command as PopulateCommand
-from Users.fakers.user import UserFaker
+from Users.fakers import UserFaker
 from Users.models import Profile
 from Users.models import User
 

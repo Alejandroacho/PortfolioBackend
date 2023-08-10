@@ -2,9 +2,7 @@ from factory import post_generation
 from factory.django import FileField
 
 from Authors.fakers import AuthorFaker
-from Certifications.fakers import CertificationFaker
 from Images.fakers import ImageFaker
-from SocialNetworks.fakers import SocialNetworkFaker
 from Users.factories import UserFactory
 
 
@@ -16,38 +14,13 @@ class UserFaker(UserFactory):
     cv: FileField = FileField(filename="cv.pdf")
 
     @post_generation
-    def certifications(self, create, extracted, **kwargs):
+    def image(self, create, extracted, **kwargs):
         if not create:
             return
         if extracted:
-            for certification in extracted:
-                self.certifications.add(certification)
+            self.image = extracted
         if not extracted:
-            self.certifications.add(
-                CertificationFaker().id, CertificationFaker().id
-            )
-
-    @post_generation
-    def images(self, create, extracted, **kwargs):
-        if not create:
-            return
-        if extracted:
-            for image in extracted:
-                self.images.add(image)
-        if not extracted:
-            self.images.add(ImageFaker().id, ImageFaker().id)
-
-    @post_generation
-    def social_networks(self, create, extracted, **kwargs):
-        if not create:
-            return
-        if extracted:
-            for social_network in extracted:
-                self.social_networks.add(social_network)
-        if not extracted:
-            self.social_networks.add(
-                SocialNetworkFaker().id, SocialNetworkFaker().id
-            )
+            self.image = ImageFaker()
 
     @post_generation
     def author(self, create, extracted, **kwargs):
