@@ -9,7 +9,7 @@ from Project.storage import image_file_upload
 
 
 class Image(Model):
-    image_type: Field = CharField(
+    type: Field = CharField(
         max_length=100,
         null=False,
         choices=ImageTypeChoices.choices,

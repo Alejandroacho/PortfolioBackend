@@ -6,19 +6,19 @@ from Images.models import Image
 
 
 class ImageAdmin(ModelAdmin):
-    list_display: tuple = ("id", "description", "image_type")
+    list_display: tuple = ("id", "description", "type")
     list_display_links: tuple = (
         "id",
         "description",
     )
     fieldsets: tuple = (
-        ("Overview", {"fields": ("id", "image_type", "description", "image")}),
+        ("Overview", {"fields": ("id", "type", "description", "image")}),
     )
     readonly_fields: list = [
         "id",
     ]
-    search_fields: tuple = ("description", "image_type", "id")
-    ordering: tuple = ("image_type",)
+    search_fields: tuple = ("description", "type", "id")
+    ordering: tuple = ("type",)
 
 
 admin.site.register(Image, ImageAdmin)

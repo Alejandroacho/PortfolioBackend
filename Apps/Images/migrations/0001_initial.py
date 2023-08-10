@@ -24,12 +24,10 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "image_type",
+                    "type",
                     models.CharField(
                         choices=[
-                            ("PC", "Pc"),
-                            ("TABLET", "Tablet"),
-                            ("MOBILE", "Mobile"),
+                            ("CARD", "Card"),
                             ("OTHER", "Other"),
                         ],
                         max_length=100,
