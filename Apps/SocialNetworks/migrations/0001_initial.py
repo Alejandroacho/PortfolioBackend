@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "social_network_platform",
+                    "platform",
                     models.CharField(
                         choices=[
                             ("LINKEDIN", "Linkedin"),

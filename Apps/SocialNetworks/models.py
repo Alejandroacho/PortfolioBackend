@@ -6,7 +6,7 @@ from SocialNetworks.choices import SocialNetworks
 
 
 class SocialNetwork(Model):
-    social_network_platform: Field = CharField(
+    platform: Field = CharField(
         max_length=100,
         null=False,
         choices=SocialNetworks.choices,
@@ -15,4 +15,4 @@ class SocialNetwork(Model):
     url: Field = CharField(max_length=100, null=False)
 
     def __str__(self) -> str:
-        return f"{self.id} | {self.nickname} - {self.social_network_platform}"
+        return f"{self.id} | {self.nickname} - {self.platform}"
