@@ -26,21 +26,5 @@ class CustomImageField(Base64ImageField):
             raise ValueError("Model and attribute must be provided")
         super().__init__(**kwargs)
 
-    def get_factory(self) -> DjangoModelFactory:
-        if self.model == "Image":
-            return getattr(factories, f"ImageFactory")
-        factory_name: str = f"{self.model}{self.model_attribute}Factory"
-        if not hasattr(factories, factory_name):
-            raise ValueError(f"Factory {factory_name} not found")
-        return getattr(factories, factory_name)
-
-    def to_internal_value(self, data: str) -> Image:
-        if data:
-            image: SimpleUploadedFile = super().to_internal_value(data)
-            factory: DjangoModelFactory = self.get_factory()
-            description: str = f"{self.model} {self.model_attribute}"
-            data = factory.create(image=image, description=description)
-        return data
-
     def to_representation(self, instance: Image) -> str:
         return instance.image.url

@@ -45,33 +45,3 @@ class UserSerializer(ModelSerializer):
             "image": ImageSerializer(instance.image).data,
             "author": AuthorSerializer(instance.author).data,
         }
-
-    def to_internal_value(self, data: dict) -> dict:
-        return {
-            "first_name": data.get("first_name"),
-            "last_name": data.get("last_name"),
-            "email": data.get("email"),
-            "about": data.get("about"),
-            "cv": CustomFileField().to_internal_value(data.get("cv", None)),
-            "image": Image.objects.filter(id__in=data.pop("image", [])),
-            "author": Author.objects.filter(
-                id=data.pop("author", None)
-            ).first(),
-        }
-
-    def create(self, validated_data: dict) -> User:
-        image = validated_data.pop("image")
-        try:
-            user = User.objects.create(**validated_data)
-        except ValueError as error:
-            raise PermissionDenied(error)
-        user.image.set(image)
-        return user
-
-    def update(self, instance: User, validated_data: dict) -> User:
-        image = validated_data.pop("image")
-        for attribute, value in validated_data.items():
-            setattr(instance, attribute, value or getattr(instance, attribute))
-        instance.image.set(image)
-        instance.save()
-        return instance
