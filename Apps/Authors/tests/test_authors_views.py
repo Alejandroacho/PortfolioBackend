@@ -5,15 +5,13 @@ from rest_framework.test import APIClient
 
 from Authors.fakers import AuthorFaker
 from Authors.models import Author
-from SocialNetworks.fakers import SocialNetworkFaker
 from SocialNetworks.serializers import SocialNetworkSerializer
-from Users.fakers.user import UserFaker
-from Users.models import User
 
 
 @mark.django_db
 class TestRetrieveEndpoint:
-    def url(self, author_id: int = None) -> str:
+    @staticmethod
+    def url(author_id: int = None) -> str:
         return (
             reverse(
                 "authors:authors-detail",
@@ -27,25 +25,9 @@ class TestRetrieveEndpoint:
         assert self.url(1) == "/api/authors/1/"
         assert self.url() == "/api/authors/"
 
-    def test_fails_as_unauthenticated(self) -> None:
+    def test_retrieve_works(self) -> None:
         author: Author = AuthorFaker()
         client: APIClient = APIClient()
-        response: Response = client.get(self.url(author.id))
-        assert response.status_code == 401
-
-    def test_fails_as_unverified(self) -> None:
-        author: Author = AuthorFaker()
-        user: User = UserFaker()
-        client: APIClient = APIClient()
-        client.force_authenticate(user)
-        response: Response = client.get(self.url(author.id))
-        assert response.status_code == 403
-
-    def test_retrieve_works_as_admin(self) -> None:
-        author: Author = AuthorFaker()
-        user: User = AdminFaker()
-        client: APIClient = APIClient()
-        client.force_authenticate(user)
         response: Response = client.get(self.url(author.id))
         assert response.status_code == 200
         assert response.data["id"] == author.id
@@ -56,12 +38,10 @@ class TestRetrieveEndpoint:
             == SocialNetworkSerializer(author.social_networks, many=True).data
         )
 
-    def test_list_works_as_admin(self) -> None:
+    def test_list_works(self) -> None:
         author: Author = AuthorFaker()
         author2: Author = AuthorFaker()
-        user: User = AdminFaker()
         client: APIClient = APIClient()
-        client.force_authenticate(user)
         response: Response = client.get(self.url())
         assert response.status_code == 200
         assert len(response.data) == 2

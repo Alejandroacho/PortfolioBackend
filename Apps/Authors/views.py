@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from Authors.models import Author
@@ -9,3 +10,4 @@ class AuthorViewSet(ReadOnlyModelViewSet):
     queryset: QuerySet = Author.objects.all().order_by("-id")
     lookup_url_kwarg: str = "pk"
     serializer_class: AuthorSerializer = AuthorSerializer
+    permission_classes = [AllowAny]
