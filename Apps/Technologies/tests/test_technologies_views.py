@@ -11,8 +11,7 @@ from Users.models import User
 
 @pytest.mark.django_db
 class TestRetrieveEndpoint:
-    @staticmethod
-    def url(technology_id: int = None) -> str:
+    def url(self, technology_id: int = None) -> str:
         return (
             reverse(
                 "technologies:technologies-detail", kwargs={"pk": technology_id}
@@ -25,7 +24,15 @@ class TestRetrieveEndpoint:
         assert self.url(1) == "/api/technologies/1/"
         assert self.url() == "/api/technologies/"
 
-    def test_works_as_unauthenticated(self) -> None:
+    def test_retrieve_works(self) -> None:
+        technology: Technology = TechnologyFaker()
+        client: APIClient = APIClient()
+        response: Response = client.get(self.url(technology.id))
+        assert response.status_code == 200
+        assert response.data["id"] == technology.id
+        assert response.data["name"] == technology.name
+
+    def test_list_works(self) -> None:
         technology: Technology = TechnologyFaker()
         technology2: Technology = TechnologyFaker()
         client: APIClient = APIClient()
