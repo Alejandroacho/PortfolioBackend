@@ -57,5 +57,3 @@ class TestRetrieveEndpoint:
         assert response.data[1]["url"] == certification.url
         assert certification.image.url in response.data[1]["image"]
         assert certification.file.url in response.data[1]["file"]
-
-
