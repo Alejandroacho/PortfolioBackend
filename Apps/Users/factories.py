@@ -1,5 +1,6 @@
 from django.db.models import Model
-from factory import post_generation, PostGenerationMethodCall
+from factory import PostGenerationMethodCall
+from factory import post_generation
 from factory.django import DjangoModelFactory
 
 from Users.models import User

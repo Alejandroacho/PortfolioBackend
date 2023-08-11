@@ -1,13 +1,12 @@
-
 from django.conf import settings
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db.models import CASCADE
 from django.db.models import CharField
 from django.db.models import Field
 from django.db.models import FileField
 from django.db.models import ForeignKey
-from django.db.models import ManyToManyField
 from django.db.models import Model
 from django_prometheus.models import ExportModelOperationsMixin
 
@@ -16,6 +15,7 @@ from Certifications.models import Certification
 from Images.models import Image
 from SocialNetworks.models import SocialNetwork
 from Users.manager import CustomUserManager
+
 
 LIMIT: int = settings.MAINTAINERS_LIMIT
 
