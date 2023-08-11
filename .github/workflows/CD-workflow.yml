@@ -1,4 +1,4 @@
-name: Versioning workflow
+name: CD workflow
 
 on:
   push:
@@ -73,20 +73,50 @@ jobs:
           echo "Got release version ${{ steps.release.outputs.version }}"
 
   Deploy:
-    needs: [Github-Versioning]
+    needs: [Docker-Tag]
     runs-on: ubuntu-latest
     steps:
     - name: 🔀 Checkout
       uses: actions/checkout@v3
-    # - name: 🚁 Deploy on PRE
-    #   if: ${{ github.base_ref == 'create-github-actions' }}
-    #   run: # Command to deploy on PRE environment
-    # - name: 🛫 Deploy on Staging
-    #   if: ${{ github.base_ref == 'create-github-actions' }}
-    #   run: # Command to deploy on STAGING environment
-    # - name: 🚀 Deploy on Production
-    #   if: ${{ github.base_ref == 'create-github-actions' }}
-    #   run: # Command to deploy on PRODUCTION environment
+    - name: 🚁 Deploy on Dev
+      uses: matheusvanzan/sshpass-action@v2
+      if: ${{ github.ref == 'refs/heads/dev' }}
+      with:
+        host: ${{ secrets.DEV_SERVER_HOST }}
+        user: ${{ secrets.DEV_SERVER_USER }}
+        pass: ${{ secrets.DEV_SERVER_PASSWORD }}
+        run: |
+          echo "${{ secrets.DEV_ENV_FILE }}" > variables.env
+          docker stop $(docker ps -aqf "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest")
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+          docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:dev-latest
+          rm -r -f variables.env
+    - name: 🛫 Deploy on Staging
+      uses: matheusvanzan/sshpass-action@v2
+      if: ${{ github.ref == 'refs/heads/staging' }}
+      with:
+        host: ${{ secrets.STAGING_SERVER_HOST }}
+        user: ${{ secrets.STAGING_SERVER_USER }}
+        pass: ${{ secrets.STAGING_SERVER_PASSWORD }}
+        run: |
+          echo "${{ secrets.STAGING_ENV_FILE }}" > variables.env
+          docker stop $(docker ps -aqf "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest")
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
+          docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:staging-latest
+          rm -r -f variables.env
+    - name: 🚀 Deploy on Production
+      uses: matheusvanzan/sshpass-action@v2
+      if: ${{ github.ref == 'refs/heads/master' }}
+      with:
+        host: ${{ secrets.PRODUCTION_SERVER_HOST }}
+        user: ${{ secrets.PRODUCTION_SERVER_USER }}
+        pass: ${{ secrets.PRODUCTION_SERVER_PASSWORD }}
+        run: |
+          echo "${{ secrets.PRODUCTION_ENV_FILE }}" > variables.env
+          docker stop $(docker ps -aqf "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest")
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
+          docker run -d --env-file variables.env ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}:latest
+          rm -r -f variables.env
 
   Done:
     needs: [Deploy]
