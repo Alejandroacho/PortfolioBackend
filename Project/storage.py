@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Model
@@ -20,21 +22,6 @@ class DocumentStorage(FileStorage):
 
 
 class FilePathHandler:
-    file_names_mapping: dict = {
-        # Default: instance model name in lower case
-        "Profile": "profile_image_of_user",
-    }
-    id_in_file_mapping: dict = {
-        # Default: instance id
-        "Profile": "user_id",
-    }
-    folder_names_mapping: dict = {
-        # Default: instance model name in lower case + file_type
-        "Image": "image"
-    }
-    id_in_folder_mapping: dict = {
-        # Default: instance id
-    }
 
     def __init__(self, instance: Model, filename: str, file_type: str) -> None:
         self.instance: Model = instance
@@ -47,34 +34,25 @@ class FilePathHandler:
 
     @property
     def file_name(self) -> str:
-        return self.file_names_mapping.get(
-            self.model_name, self.model_name.lower()
-        )
+        return self.model_name.lower()
 
     @property
-    def id_in_file(self) -> int:
-        attribute: str = self.id_in_file_mapping.get(self.model_name, "id")
-        return (
-            getattr(self.instance, attribute, self.instance.pk)
-            or self.get_last_id()
-        )
+    def id_in_file(self) -> uuid.UUID:
+        return uuid.uuid1()
 
     @property
     def full_file_name(self) -> str:
         extension: str = self.filename.split(".")[-1]
-        return f"{self.file_name}_{self.id_in_file}.{extension}"
+        return f"{self.file_type}_{str(self.id_in_file)}.{extension}"
 
     @property
     def folder_name(self) -> str:
-        return self.folder_names_mapping.get(
-            self.model_name, f"{self.model_name.lower()}_{self.file_type}"
-        )
+        return f"{self.model_name.lower()}s"
 
     @property
     def id_in_folder(self) -> int:
-        attribute: str = self.id_in_folder_mapping.get(self.model_name, "id")
         return (
-            getattr(self.instance, attribute, self.instance.pk)
+            getattr(self.instance, "id", self.instance.pk)
             or self.get_last_id()
         )
 
@@ -102,11 +80,12 @@ def document_file_upload(instance: Model, filename: str) -> str:
     return file_upload(instance, filename, "documents")
 
 
-def file_upload(instance: Model, filename: str, type: str) -> str:
-    path_handler: FilePathHandler = FilePathHandler(instance, filename, type)
+def file_upload(instance: Model, filename: str, _type: str) -> str:
+    path_handler: FilePathHandler = FilePathHandler(instance, filename, _type)
+    base_path: str = ""
     if not are_aws_variables_set():
         base_path: str = f"{settings.MEDIA_PATH}/"
-    return f"{base_path or ''}{path_handler.get_file_path()}"
+    return f"{base_path}{path_handler.get_file_path()}"
 
 
 def get_image_storage() -> ImageStorage or None:
