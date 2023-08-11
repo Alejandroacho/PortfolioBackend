@@ -22,7 +22,6 @@ class DocumentStorage(FileStorage):
 
 
 class FilePathHandler:
-
     def __init__(self, instance: Model, filename: str, file_type: str) -> None:
         self.instance: Model = instance
         self.filename: str = filename
@@ -52,8 +51,7 @@ class FilePathHandler:
     @property
     def id_in_folder(self) -> int:
         return (
-            getattr(self.instance, "id", self.instance.pk)
-            or self.get_last_id()
+            getattr(self.instance, "id", self.instance.pk) or self.get_last_id()
         )
 
     def get_last_id(self) -> int:
