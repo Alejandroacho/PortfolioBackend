@@ -77,7 +77,7 @@ class Command(BaseCommand):
         AuthorFaker(
             first_name=user.first_name,
             last_name=user.last_name,
-            social_networks=social_networks
+            social_networks=social_networks,
         )
         for _ in progress(instances):
             authors.append(AuthorFaker())
