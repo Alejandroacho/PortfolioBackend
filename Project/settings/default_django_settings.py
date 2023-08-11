@@ -203,7 +203,7 @@ SPECTACULAR_SETTINGS: dict = {
         "deepLinking": False,
         "persistAuthorization": True,
         "displayOperationId": True,
-        "defaultModelsExpandDepth": 0
+        "defaultModelsExpandDepth": 0,
     },
 }
 
