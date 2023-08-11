@@ -1,7 +1,5 @@
 from os import environ
 
-import pytest
-
 from Project.utils.services_urls import set_services_urls
 
 

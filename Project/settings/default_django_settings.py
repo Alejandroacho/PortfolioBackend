@@ -198,6 +198,13 @@ SPECTACULAR_SETTINGS: dict = {
     "DESCRIPTION": "Alejandro Acho Portfolio",
     "VERSION": "1.0.0",
     "SCHEMA_PATH_PREFIX": r"/api/",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": False,
+        "persistAuthorization": True,
+        "displayOperationId": True,
+        "defaultModelsExpandDepth": 0
+    },
 }
 
 # Default primary key field type
