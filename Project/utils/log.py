@@ -17,16 +17,3 @@ def log_information(event: str, instance: Model) -> None:
     introduction: str = f"{class_name}s App | {class_name}"
     message: str = f'{introduction} "{instance.id}" {event} at {now}'
     logger.info(message)
-
-
-def log_email_action(email_type: str, instance: Model) -> None:
-    if email_type == "verify_email":
-        logger.info(
-            "Users App | New user, verification email sent to "
-            f"{instance.email} at {datetime.now()}"
-        )
-    else:
-        logger.info(
-            "Users App | Password restore, email sent to "
-            f"{instance.user.email} at {datetime.now()}"
-        )

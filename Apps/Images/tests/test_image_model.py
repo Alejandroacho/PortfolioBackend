@@ -25,7 +25,7 @@ class TestImageFactory:
     def test_factory_creates_an_instance(self) -> None:
         assert Image.objects.count() == 0
         image: Image = ImageFactory(
-            type="PC",
+            type="OTHER",
             description="This is a test image",
             image="image.jpeg",
         )
@@ -40,6 +40,6 @@ class TestImageFaker:
         image: Image = ImageFaker()
         assert isinstance(image, Image)
         assert Image.objects.count() == 1
-        assert image.type == "PC"
+        assert image.type == "OTHER"
         assert image.description == "This is a test image"
         assert isinstance(image.image, ImageFieldFile)

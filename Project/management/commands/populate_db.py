@@ -4,15 +4,14 @@ from logging import getLogger
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandParser
-from tqdm import tqdm
 from tqdm import trange as progress
 
-from Emails.choices import CommentType
-from Emails.factories.email import VerifyEmailFactory
-from Emails.factories.suggestion import SuggestionEmailFactory
-from Users.factories.profile import ProfileFactory
-from Users.fakers.user import AdminFaker
-from Users.fakers.user import UserFaker
+from Authors.fakers import AuthorFaker
+from Certifications.fakers import CertificationFaker
+from Projects.fakers import ProjectFaker
+from SocialNetworks.fakers import SocialNetworkFaker
+from Technologies.fakers import TechnologyFaker
+from Users.fakers import UserFaker
 from Users.models import User
 
 
@@ -32,8 +31,8 @@ class Command(BaseCommand):
 
     def handle(self, *args: tuple, **options: dict) -> None:
         if settings.ENVIRONMENT_NAME in ["dev", "local", "test"]:
-            instances_number: int = options["instances"]
-            create_admin: bool = options["admin"]
+            instances_number: int = int(options["instances"])
+            create_admin: bool = bool(options["admin"])
             self.populate(instances_number, create_admin)
         else:
             logger.critical(
@@ -41,53 +40,68 @@ class Command(BaseCommand):
                 + " production environments"
             )
 
-    def populate(self, instances_number: int, create_admin: bool) -> None:
-        users: list = self.create_fake_users(instances_number)
-        self.create_fake_verify_emails(users)
-        self.create_fake_profiles(users)
-        self.create_fake_suggestions(users)
-        if create_admin:
-            self.create_admin_user()
+    def populate(self, instances_number: int, _: bool) -> None:
+        user: User = self.create_fake_user()
+        social_networks: list = self.create_fake_social_networks(
+            instances_number
+        )
+        authors: list = self.create_fake_authors(
+            user, social_networks, instances_number
+        )
+        technologies: list = self.create_fake_technologies(instances_number)
+        self.create_fake_certifications(instances_number)
+        self.create_fake_projects(authors, technologies, instances_number)
 
-    def create_fake_users(self, instances_number: int) -> list:
-        self.stdout.write("Creating fake users")
-        users: list = []
-        for _ in progress(instances_number):
-            user: User = UserFaker()
-            users.append(user)
-        self.stdout.write("Fake users created")
-        return users
-
-    def create_fake_verify_emails(self, users: list) -> None:
-        self.stdout.write("Creating fake verify emails")
-        with tqdm(total=len(users)) as progress_bar:
-            for user in users:
-                VerifyEmailFactory(instance=user)
-                progress_bar.update(1)
-        self.stdout.write("Fake verify emails created")
-
-    def create_fake_profiles(self, users: list) -> None:
-        self.stdout.write("Creating fake profiles")
-        with tqdm(total=len(users)) as progress_bar:
-            for user in users:
-                ProfileFactory(user=user)
-                progress_bar.update(1)
-        self.stdout.write("Fake profiles created")
-
-    def create_fake_suggestions(self, users: list) -> None:
-        self.stdout.write("Creating fake suggestions")
-        type: str = CommentType.SUGGESTION.value
-        content: str = "This is a fake suggestion"
-        with tqdm(total=len(users)) as progress_bar:
-            for user in users:
-                SuggestionEmailFactory(type=type, content=content, user=user)
-                progress_bar.update(1)
-        self.stdout.write("Fake profiles created")
-
-    def create_admin_user(self) -> None:
-        self.stdout.write("Creating admin user")
-        AdminFaker(
+    def create_fake_user(self) -> User:
+        self.stdout.write("Creating fake user")
+        user: User = UserFaker(
             email="admin@admin.com",
             password="adminpassword",
         )
-        self.stdout.write("Admin user created")
+        self.stdout.write("Fake user created")
+        return user
+
+    def create_fake_social_networks(self, instances: int) -> list:
+        self.stdout.write("Creating fake social networks")
+        social_networks: list = []
+        for _ in progress(instances):
+            social_networks.append(SocialNetworkFaker())
+        self.stdout.write("Fake social networks created")
+        return social_networks
+
+    def create_fake_authors(
+        self, user: User, social_networks: list, instances: int
+    ) -> list:
+        self.stdout.write("Creating fake authors")
+        authors: list = []
+        AuthorFaker(
+            first_name=user.first_name,
+            last_name=user.last_name,
+            social_networks=social_networks,
+        )
+        for _ in progress(instances):
+            authors.append(AuthorFaker())
+        self.stdout.write("Fake authors created")
+        return authors
+
+    def create_fake_certifications(self, instances: int) -> None:
+        self.stdout.write("Creating fake certifications")
+        for _ in progress(instances):
+            CertificationFaker()
+        self.stdout.write("Fake certifications created")
+
+    def create_fake_technologies(self, instances: int) -> list:
+        self.stdout.write("Creating fake technologies")
+        technologies: list = []
+        for _ in progress(instances):
+            technologies.append(TechnologyFaker())
+        self.stdout.write("Fake technologies created")
+        return technologies
+
+    def create_fake_projects(
+        self, authors: list, technologies: list, instances: int
+    ) -> None:
+        self.stdout.write("Creating fake projects")
+        for _ in progress(instances):
+            ProjectFaker(technologies=technologies, authors=authors)
+        self.stdout.write("Fake projects created")

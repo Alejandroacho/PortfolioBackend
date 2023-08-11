@@ -12,6 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args: tuple, **options: dict) -> None:
         self.execute_sql()
 
-    def execute_sql(self) -> None:
+    @staticmethod
+    def execute_sql() -> None:
         with connection.cursor() as cursor:
             cursor.execute(CREATE_TEST_DB)
