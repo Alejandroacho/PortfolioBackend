@@ -52,5 +52,5 @@ class TestCertificationFaker:
         assert certification.description == "This is a fake certification"
         assert certification.tags == ["test", "test2", "test3"]
         assert certification.url == "https://www.appname.com"
-        assert "certification_documents" in certification.file.name
+        assert "certifications" in certification.file.name
         assert "image" in certification.image.image.name
