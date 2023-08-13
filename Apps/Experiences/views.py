@@ -1,12 +1,13 @@
 from django.db.models import QuerySet
+from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import AllowAny
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from Experiences.models import Experience
 from Experiences.serializers import ExperienceSerializer
 
 
-class ExperienceViewSet(ReadOnlyModelViewSet):
+class ExperienceViewSet(ListModelMixin, GenericViewSet):
     """
     API endpoint that allows to interact with Experience model
     """

@@ -13,40 +13,11 @@ from Technologies.serializers import TechnologySerializer
 @pytest.mark.django_db
 class TestRetrieveEndpoint:
     @staticmethod
-    def url(project_id: int = None) -> str:
-        return (
-            reverse("projects:projects-detail", kwargs={"pk": project_id})
-            if project_id
-            else reverse("projects:projects-list")
-        )
+    def url() -> str:
+        return reverse("projects:projects-list")
 
     def test_url(self) -> None:
-        assert self.url(1) == "/api/projects/1/"
         assert self.url() == "/api/projects/"
-
-    def test_retrieve_works(self) -> None:
-        project: Project = ProjectFaker()
-        client: APIClient = APIClient()
-        response: Response = client.get(self.url(project.id))
-        assert response.status_code == 200
-        assert response.data["id"] == project.id
-        assert response.data["title"] == project.title
-        assert response.data["description"] == project.description
-        assert response.data["url"] == project.url
-        assert response.data["is_public"] == project.is_public
-        assert response.data["repository"] == project.repository
-        assert (
-            response.data["technologies"]
-            == TechnologySerializer(project.technologies.all(), many=True).data
-        )
-        assert (
-            response.data["authors"]
-            == AuthorSerializer(project.authors.all(), many=True).data
-        )
-        assert (
-            response.data["images"]
-            == ImageSerializer(project.images.all(), many=True).data
-        )
 
     def test_list_works(self) -> None:
         project: Project = ProjectFaker()

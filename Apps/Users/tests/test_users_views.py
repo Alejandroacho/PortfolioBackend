@@ -27,20 +27,3 @@ class TestUserListEndpoint:
     ) -> None:
         response: Response = client.get(self.url(), format="json")
         assert response.status_code == 200
-
-
-@mark.django_db
-class TestUserRetrieveEndpoint:
-    @staticmethod
-    def url(pk: int = None) -> str:
-        return reverse("users:users-detail", args=[pk])
-
-    def test_url(self) -> None:
-        assert self.url(1) == "/api/users/1/"
-
-    def test_get_user_works_as_an_unauthenticated_user(
-        self, client: APIClient
-    ) -> None:
-        normal_user: User = UserFaker()
-        response: Response = client.get(self.url(normal_user.id), format="json")
-        assert response.status_code == 200

@@ -10,32 +10,11 @@ from Certifications.models import Certification
 @mark.django_db
 class TestRetrieveEndpoint:
     @staticmethod
-    def url(certification_id: int = None) -> str:
-        return (
-            reverse(
-                "certifications:certifications-detail",
-                kwargs={"pk": certification_id},
-            )
-            if certification_id
-            else reverse("certifications:certifications-list")
-        )
+    def url() -> str:
+        return reverse("certifications:certifications-list")
 
     def test_url(self) -> None:
-        assert self.url(1) == "/api/certifications/1/"
         assert self.url() == "/api/certifications/"
-
-    def test_retrieve_works(self) -> None:
-        certification: Certification = CertificationFaker()
-        client: APIClient = APIClient()
-        response: Response = client.get(self.url(certification.id))
-        assert response.status_code == 200
-        assert response.data["id"] == certification.id
-        assert response.data["name"] == certification.name
-        assert response.data["description"] == certification.description
-        assert response.data["tags"] == f"{certification.tags}"
-        assert response.data["url"] == certification.url
-        assert certification.image.url in response.data["image"]
-        assert certification.file.url in response.data["file"]
 
     def test_list_works(self) -> None:
         certification: Certification = CertificationFaker()
