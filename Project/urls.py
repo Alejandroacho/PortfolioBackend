@@ -11,6 +11,7 @@ urlpatterns: list = [
     URLGenerator.generate("Users"),
     URLGenerator.generate("Certifications"),
     URLGenerator.generate("Projects"),
+    URLGenerator.generate("Experiences"),
     *URLGenerator.api_documentation_urls,
     *URLGenerator.media_urls,
 ]
