@@ -1,7 +1,7 @@
 from factory import post_generation
 
-from Images.fakers import ImageFaker
 from Experiences.factories import ExperienceFactory
+from Images.fakers import ImageFaker
 from Images.models import Image
 from Technologies.fakers import TechnologyFaker
 
