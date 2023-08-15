@@ -14,22 +14,24 @@ class ProjectFaker(ProjectFactory):
     repository: str = "https://www.test.com"
 
     @post_generation
-    def technologies(self, create, extracted, **kwargs):
+    def technologies(
+        self, create: bool, extracted: list, **kwargs: dict
+    ) -> None:
         if not extracted:
             self.technologies.add(TechnologyFaker())
         else:
-            super().technologies(create, extracted, **kwargs)
+            [self.technologies.add(technology) for technology in extracted]
 
     @post_generation
-    def authors(self, create, extracted, **kwargs):
+    def authors(self, create: bool, extracted: list, **kwargs: dict) -> None:
         if not extracted:
             self.authors.add(AuthorFaker())
         else:
-            super().authors(create, extracted, **kwargs)
+            [self.authors.add(author) for author in extracted]
 
     @post_generation
-    def images(self, create, extracted, **kwargs):
+    def images(self, create: bool, extracted: list, **kwargs: dict) -> None:
         if not extracted:
             self.images.add(ImageFaker())
         else:
-            super().images(create, extracted, **kwargs)
+            [self.images.add(image) for image in extracted]

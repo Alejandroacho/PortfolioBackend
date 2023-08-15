@@ -1,31 +1,23 @@
-from datetime import datetime
-
-from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db.models import CASCADE
-from django.db.models import BooleanField
 from django.db.models import CharField
-from django.db.models import DateField
-from django.db.models import DateTimeField
-from django.db.models import EmailField
 from django.db.models import Field
-from django.db.models import ImageField
+from django.db.models import FileField
+from django.db.models import ForeignKey
 from django.db.models import Model
-from django.db.models import OneToOneField
-from django.db.models import TextField
-from django.db.models.fields.related import ForeignObject
 from django_prometheus.models import ExportModelOperationsMixin
-from phonenumber_field.modelfields import PhoneNumberField
 
-from Project.storage import ImageStorage
-from Project.storage import get_image_storage
-from Project.storage import image_file_upload
-from Users.choices import AuthProviders
-from Users.choices import GenderChoices
-from Users.choices import PreferredLanguageChoices
+from Authors.models import Author
+from Certifications.models import Certification
+from Images.models import Image
+from SocialNetworks.models import SocialNetwork
 from Users.manager import CustomUserManager
+
+
+LIMIT: int = settings.MAINTAINERS_LIMIT
 
 
 class User(
@@ -35,48 +27,27 @@ class User(
     is_superuser: None = None
     last_login: None = None
 
-    email: Field = EmailField(
-        "Email address",
-        unique=True,
-        error_messages={"unique": "This email already exists."},
+    first_name: Field = CharField(max_length=100)
+    last_name: Field = CharField(max_length=100)
+    email: Field = CharField(
+        max_length=100, unique=True, null=False, blank=False
     )
-    first_name: Field = CharField("First name", null=False, max_length=50)
-    last_name: Field = CharField("Last name", null=False, max_length=50)
-    phone_number: PhoneNumberField = PhoneNumberField(
-        "Phone number",
+    about: Field = CharField(max_length=5000, null=False, blank=True)
+    cv: Field = FileField(null=True, blank=True)
+    image: Field = ForeignKey(
+        Image,
+        on_delete=CASCADE,
+        related_name="images",
+        blank=True,
+        null=True,
+    )
+    author: Field = ForeignKey(
+        Author,
+        on_delete=CASCADE,
+        related_name="author",
         null=True,
         blank=True,
-        max_length=22,
-        unique=True,
-        error_messages={"unique": "This number already exists."},
     )
-    gender: Field = CharField(
-        "Gender",
-        max_length=1,
-        choices=GenderChoices.choices,
-        default=GenderChoices.NOT_SAID,
-        null=True,
-    )
-    birth_date: Field = DateField("Birth date", null=True, auto_now_add=False)
-    preferred_language: Field = CharField(
-        "Preferred language",
-        max_length=2,
-        choices=PreferredLanguageChoices.choices,
-        default=PreferredLanguageChoices.ENGLISH,
-        null=True,
-    )
-    is_verified: Field = BooleanField("Verified", default=False)
-    is_premium: Field = BooleanField("Premium", default=False)
-    is_admin: Field = BooleanField("Admin", default=False)
-    auth_provider: Field = CharField(
-        "Auth provider",
-        max_length=10,
-        choices=AuthProviders.choices,
-        default=AuthProviders.EMAIL,
-        null=True,
-    )
-    created_at: Field = DateTimeField("Creation date", auto_now_add=True)
-    updated_at: Field = DateTimeField("Update date", auto_now=True)
 
     USERNAME_FIELD: str = "email"
     REQUIRED_FIELDS: list = ["first_name", "last_name"]
@@ -84,29 +55,7 @@ class User(
     objects: BaseUserManager = CustomUserManager()
 
     def __str__(self) -> str:
-        return self.email
-
-    def create_profile(self) -> None:
-        if not Profile.objects.filter(user=self).exists():
-            Profile.objects.create(user=self)
-
-    def has_perm(self, permission: str, object: Model = None) -> bool:
-        return self.is_admin
-
-    def has_permission(self, object: Model = None) -> bool:
-        if isinstance(object, User):
-            return object.id == self.id
-        else:
-            return object.user.id == self.id
-
-    def has_module_perms(self, app_label: str) -> bool:
-        return self.is_admin
-
-    def verify(self) -> None:
-        self.is_verified = True
-        if not Profile.objects.filter(user=self).exists():
-            Profile.objects.create(user=self)
-        self.save()
+        return str(self.email)
 
     @property
     def name(self) -> str:
@@ -114,41 +63,22 @@ class User(
 
     @property
     def is_staff(self) -> bool:
-        return self.is_admin
+        return True
 
-    @property
-    def is_adult(self) -> bool:
-        if not self.birth_date:
-            return None
-        adultness: datetime = datetime.now() - relativedelta(years=18)
-        birthday: datetime = datetime.strptime(str(self.birth_date), "%Y-%m-%d")
-        return birthday < adultness
+    @staticmethod
+    def has_permission(_: Model = None) -> bool:
+        return True
 
+    def has_perm(self, permission: str, _: Model = None) -> bool:
+        return True
 
-class Profile(ExportModelOperationsMixin("profile"), Model):
-    user: ForeignObject = OneToOneField(
-        User,
-        on_delete=CASCADE,
-        related_name="profile",
-    )
-    nickname: Field = CharField(
-        "Nick",
-        unique=True,
-        error_messages={"unique": "This nickname already exists."},
-        null=True,
-        blank=True,
-        max_length=50,
-    )
-    bio: Field = TextField("Bio", null=True, blank=True)
-    image: Field = ImageField(
-        "Profile image",
-        storage=get_image_storage(),
-        upload_to=image_file_upload,
-        null=True,
-        blank=True,
-    )
-    created_at: Field = DateTimeField("Creation date", auto_now_add=True)
-    updated_at: Field = DateTimeField("Update date", auto_now=True)
+    def has_module_perms(self, _: str) -> bool:
+        return True
 
-    def __str__(self) -> str:
-        return f"User ({self.user_id}) profile ({self.pk})"
+    # There can only be a limited number of instances of this model in the DB
+    def save(self, *args: tuple, **kwargs: dict) -> None:
+        users_count: int = User.objects.count()
+        users_ids: list = User.objects.values_list("pk", flat=True)
+        if users_count == LIMIT and self.pk not in users_ids:
+            raise ValueError(f"There can be only {LIMIT} user instance")
+        return super().save(*args, **kwargs)

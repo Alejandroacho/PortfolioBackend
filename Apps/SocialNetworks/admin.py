@@ -11,7 +11,10 @@ class SocialNetworkAdmin(ModelAdmin):
     list_display_links: tuple = ("id", "platform")
     list_filter: tuple = ("platform",)
     fieldsets: tuple = (
-        ("Overview", {"fields": ("id", "platform", "nickname", "url")}),
+        (
+            "Overview",
+            {"fields": ("id", "platform", "nickname", "url")},
+        ),
     )
     readonly_fields: list = [
         "id",
