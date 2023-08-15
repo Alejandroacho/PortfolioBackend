@@ -59,6 +59,7 @@ LOCAL_APPS: list = [
     "Certifications",
     "Authors",
     "Projects",
+    "Experiences",
 ]
 
 INSTALLED_APPS: list = (

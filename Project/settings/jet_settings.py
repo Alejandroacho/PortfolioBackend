@@ -47,8 +47,28 @@ JET_SIDE_MENU_ITEMS: list = [
         "label": "Portfolio",
         "items": [
             {
+                "label": "Projects",
+                "url": "/admin/Projects/project/",
+                "url_blank": False,
+            },
+            {
+                "label": "Experiences",
+                "url": "/admin/Experiences/experience/",
+                "url_blank": False,
+            },
+            {
+                "label": "Certifications",
+                "url": "/admin/Certifications/certification/",
+                "url_blank": False,
+            },
+            {
                 "label": "Technologies",
                 "url": "/admin/Technologies/technology/",
+                "url_blank": False,
+            },
+            {
+                "label": "Authors",
+                "url": "/admin/Authors/author/",
                 "url_blank": False,
             },
             {
@@ -59,21 +79,6 @@ JET_SIDE_MENU_ITEMS: list = [
             {
                 "label": "Images",
                 "url": "/admin/Images/image/",
-                "url_blank": False,
-            },
-            {
-                "label": "Certifications",
-                "url": "/admin/Certifications/certification/",
-                "url_blank": False,
-            },
-            {
-                "label": "Authors",
-                "url": "/admin/Authors/author/",
-                "url_blank": False,
-            },
-            {
-                "label": "Projects",
-                "url": "/admin/Projects/project/",
                 "url_blank": False,
             },
         ],

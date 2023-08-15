@@ -8,6 +8,7 @@ from tqdm import trange as progress
 
 from Authors.fakers import AuthorFaker
 from Certifications.fakers import CertificationFaker
+from Experiences.fakers import ExperienceFaker
 from Projects.fakers import ProjectFaker
 from SocialNetworks.fakers import SocialNetworkFaker
 from Technologies.fakers import TechnologyFaker
@@ -51,6 +52,7 @@ class Command(BaseCommand):
         technologies: list = self.create_fake_technologies(instances_number)
         self.create_fake_certifications(instances_number)
         self.create_fake_projects(authors, technologies, instances_number)
+        self.create_fake_experiences(instances_number)
 
     def create_fake_user(self) -> User:
         self.stdout.write("Creating fake user")
@@ -105,3 +107,9 @@ class Command(BaseCommand):
         for _ in progress(instances):
             ProjectFaker(technologies=technologies, authors=authors)
         self.stdout.write("Fake projects created")
+
+    def create_fake_experiences(self, instances: int) -> None:
+        self.stdout.write("Creating fake experiences")
+        for _ in progress(instances):
+            ExperienceFaker()
+        self.stdout.write("Fake experiences created")
