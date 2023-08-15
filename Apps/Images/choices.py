@@ -2,7 +2,5 @@ from django.db.models import TextChoices
 
 
 class ImageTypeChoices(TextChoices):
-    PC: str = "PC"
-    TABLET: str = "TABLET"
-    MOBILE: str = "MOBILE"
+    CARD: str = "CARD"
     OTHER: str = "OTHER"

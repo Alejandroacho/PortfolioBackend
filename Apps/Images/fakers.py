@@ -7,7 +7,7 @@ from Images.factories import ImageFactory
 
 
 class ImageFaker(ImageFactory):
-    type: CharField = ImageTypeChoices.PC.value
+    type: CharField = ImageTypeChoices.OTHER.value
     description: CharField = "This is a test image"
     image: ImageField = ImageField(
         filename="image.jpeg",

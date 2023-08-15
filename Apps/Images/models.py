@@ -28,7 +28,7 @@ class Image(Model):
 
     @property
     def url(self) -> str:
-        return self.image.url
+        return self.image.url if self.image and self.image.url else ""
 
     @property
     def name(self) -> str:

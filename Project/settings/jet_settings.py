@@ -2,14 +2,8 @@ import os
 
 from django.utils.html import format_html
 
-from Project.settings.labels_with_svg import black_list_with_icon
-from Project.settings.labels_with_svg import block_label_with_icon
-from Project.settings.labels_with_svg import email_label_with_icon
 from Project.settings.labels_with_svg import log_label_with_icon
-from Project.settings.labels_with_svg import notification_with_icon
-from Project.settings.labels_with_svg import profile_label_with_icon
 from Project.settings.labels_with_svg import redoc_label_with_icon
-from Project.settings.labels_with_svg import suggestion_label_with_icon
 from Project.settings.labels_with_svg import swagger_label_with_icon
 from Project.settings.labels_with_svg import user_label_with_icon
 from Project.utils.services_urls import set_services_urls
@@ -47,32 +41,34 @@ JET_SIDE_MENU_ITEMS: list = [
         "app_label": "Users",
         "items": [
             {"name": "user", "label": format_html(user_label_with_icon)},
-            {"name": "profile", "label": format_html(profile_label_with_icon)},
-        ],
-    },
-    {
-        "label": ("Email"),
-        "app_label": "Emails",
-        "items": [
-            {
-                "name": "suggestion",
-                "label": format_html(suggestion_label_with_icon),
-            },
-            {"name": "email", "label": format_html(email_label_with_icon)},
-            {
-                "name": "notification",
-                "label": format_html(notification_with_icon),
-            },
-            {"name": "block", "label": format_html(block_label_with_icon)},
-            {"name": "blacklist", "label": format_html(black_list_with_icon)},
         ],
     },
     {
         "label": "Portfolio",
         "items": [
             {
+                "label": "Projects",
+                "url": "/admin/Projects/project/",
+                "url_blank": False,
+            },
+            {
+                "label": "Experiences",
+                "url": "/admin/Experiences/experience/",
+                "url_blank": False,
+            },
+            {
+                "label": "Certifications",
+                "url": "/admin/Certifications/certification/",
+                "url_blank": False,
+            },
+            {
                 "label": "Technologies",
                 "url": "/admin/Technologies/technology/",
+                "url_blank": False,
+            },
+            {
+                "label": "Authors",
+                "url": "/admin/Authors/author/",
                 "url_blank": False,
             },
             {
@@ -83,26 +79,6 @@ JET_SIDE_MENU_ITEMS: list = [
             {
                 "label": "Images",
                 "url": "/admin/Images/image/",
-                "url_blank": False,
-            },
-            {
-                "label": "Certifications",
-                "url": "/admin/Certifications/certification/",
-                "url_blank": False,
-            },
-            {
-                "label": "Authors",
-                "url": "/admin/Authors/author/",
-                "url_blank": False,
-            },
-            {
-                "label": "Projects",
-                "url": "/admin/Projects/project/",
-                "url_blank": False,
-            },
-            {
-                "label": "Maintainers",
-                "url": "/admin/Maintainers/maintainer/",
                 "url_blank": False,
             },
         ],

@@ -27,9 +27,7 @@ class Migration(migrations.Migration):
                     "type",
                     models.CharField(
                         choices=[
-                            ("PC", "Pc"),
-                            ("TABLET", "Tablet"),
-                            ("MOBILE", "Mobile"),
+                            ("CARD", "Card"),
                             ("OTHER", "Other"),
                         ],
                         max_length=100,
