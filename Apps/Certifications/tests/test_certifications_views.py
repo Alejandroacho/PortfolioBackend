@@ -27,12 +27,12 @@ class TestRetrieveEndpoint:
         assert response.data[0]["description"] == certification2.description
         assert response.data[0]["tags"] == f"{certification2.tags}"
         assert response.data[0]["url"] == certification2.url
-        assert certification2.image.url in response.data[0]["image"]
+        assert certification2.image.url == response.data[0]["image"]["url"]
         assert certification2.file.url in response.data[0]["file"]
         assert response.data[1]["id"] == certification.id
         assert response.data[1]["name"] == certification.name
         assert response.data[1]["description"] == certification.description
         assert response.data[1]["tags"] == f"{certification.tags}"
         assert response.data[1]["url"] == certification.url
-        assert certification.image.url in response.data[1]["image"]
+        assert certification.image.url == response.data[1]["image"]["url"]
         assert certification.file.url in response.data[1]["file"]

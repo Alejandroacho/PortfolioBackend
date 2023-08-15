@@ -6,7 +6,7 @@ from rest_framework.fields import Field
 from rest_framework.serializers import ModelSerializer
 
 from Certifications.models import Certification
-from Images.serializers import CustomImageField
+from Images.serializers import ImageSerializer
 
 
 class CustomFileField(Base64FileField):
@@ -24,11 +24,9 @@ class CertificationSerializer(ModelSerializer):
     tags: Field = CharField(max_length=1000, allow_null=True)
     url: Field = CharField(max_length=1000, allow_null=True)
     file: Base64FileField = CustomFileField(required=False, allow_null=True)
-    image: Field = CustomImageField(
+    image: Field = ImageSerializer(
         required=False,
         allow_null=True,
-        model="Certification",
-        attribute="Image",
     )
 
     class Meta:
