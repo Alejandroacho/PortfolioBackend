@@ -8,9 +8,9 @@ from Technologies.fakers import TechnologyFaker
 
 class ProjectFaker(ProjectFactory):
     title: str = "Test Project"
+    introduction: str = "Test Introduction"
     description: str = "Test Description"
     url: str = "https://www.test.com"
-    is_public: bool = True
     repository: str = "https://www.test.com"
 
     @post_generation

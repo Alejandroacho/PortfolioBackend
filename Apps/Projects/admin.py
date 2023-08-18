@@ -17,6 +17,7 @@ class ProjectAdmin(ModelAdmin):
                 "fields": (
                     "id",
                     "title",
+                    "introduction",
                     "description",
                     "url",
                     "is_public",
