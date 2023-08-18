@@ -1,12 +1,9 @@
 from django.db.models import Model
 from drf_extra_fields.fields import Base64FileField
 from filetype import guess as guess_file_extension
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import ModelSerializer
 
-from Authors.models import Author
 from Authors.serializers import AuthorSerializer
-from Images.models import Image
 from Images.serializers import ImageSerializer
 from Users.models import User
 
