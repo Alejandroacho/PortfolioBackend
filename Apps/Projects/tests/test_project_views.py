@@ -27,9 +27,9 @@ class TestRetrieveEndpoint:
         assert response.status_code == 200
         assert response.data[1]["id"] == project.id
         assert response.data[1]["title"] == project.title
+        assert response.data[1]["introduction"] == project.introduction
         assert response.data[1]["description"] == project.description
         assert response.data[1]["url"] == project.url
-        assert response.data[1]["is_public"] == project.is_public
         assert response.data[1]["repository"] == project.repository
         assert (
             response.data[1]["technologies"]
@@ -45,9 +45,9 @@ class TestRetrieveEndpoint:
         )
         assert response.data[0]["id"] == project2.id
         assert response.data[0]["title"] == project2.title
+        assert response.data[0]["introduction"] == project2.introduction
         assert response.data[0]["description"] == project2.description
         assert response.data[0]["url"] == project2.url
-        assert response.data[0]["is_public"] == project2.is_public
         assert response.data[0]["repository"] == project2.repository
         assert (
             response.data[0]["technologies"]

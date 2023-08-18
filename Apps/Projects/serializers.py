@@ -25,9 +25,9 @@ class ProjectSerializer(ModelSerializer):
         return {
             "id": instance.id,
             "title": instance.title,
+            "introduction": instance.introduction,
             "description": instance.description,
             "url": instance.url,
-            "is_public": instance.is_public,
             "repository": instance.repository,
             "authors": AuthorSerializer(instance.authors.all(), many=True).data,
             "images": ImageSerializer(instance.images.all(), many=True).data,

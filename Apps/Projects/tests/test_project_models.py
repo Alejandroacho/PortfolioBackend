@@ -17,7 +17,6 @@ class TestProjectModel:
         assert hasattr(project, "introduction")
         assert hasattr(project, "description")
         assert hasattr(project, "url")
-        assert hasattr(project, "is_public")
         assert hasattr(project, "repository")
         assert hasattr(project, "technologies")
         assert hasattr(project, "authors")
@@ -56,7 +55,6 @@ class TestProjectFaker:
         assert project.title == "Test Project"
         assert project.description == "Test Description"
         assert project.url == "https://www.test.com"
-        assert project.is_public == True
         assert project.repository == "https://www.test.com"
         assert project.technologies.count() == 1
         assert project.authors.count() == 1
