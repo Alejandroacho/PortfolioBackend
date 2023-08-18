@@ -14,6 +14,7 @@ class TestProjectModel:
         project: Project = ProjectFaker()
         assert hasattr(project, "id")
         assert hasattr(project, "title")
+        assert hasattr(project, "introduction")
         assert hasattr(project, "description")
         assert hasattr(project, "url")
         assert hasattr(project, "is_public")
@@ -33,9 +34,9 @@ class TestProjectFactory:
         assert Project.objects.count() == 0
         project: Project = ProjectFactory(
             title="Test Project",
+            introduction="Test Introduction",
             description="Test Description",
             url="https://www.test.com",
-            is_public=True,
             repository="https://www.test.com",
             technologies=[TechnologyFaker().id],
             authors=[AuthorFaker().id],

@@ -44,28 +44,13 @@ class Migration(migrations.Migration):
                         to="Authors.author",
                     ),
                 ),
-                (
-                    "certifications",
-                    models.ManyToManyField(
-                        blank=True,
-                        related_name="certifications",
-                        to="Certifications.certification",
-                    ),
-                ),
-                (
-                    "images",
-                    models.ManyToManyField(
-                        blank=True, related_name="images", to="Images.image"
-                    ),
-                ),
-                (
-                    "social_networks",
-                    models.ManyToManyField(
-                        blank=True,
-                        related_name="social_networks",
-                        to="SocialNetworks.socialnetwork",
-                    ),
-                ),
+                ("image", models.ForeignKey(
+                    blank=True,
+                    null=True,
+                    on_delete=django.db.models.deletion.CASCADE,
+                    related_name="images",
+                    to="Images.image"
+                )),
             ],
         ),
     ]

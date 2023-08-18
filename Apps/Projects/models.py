@@ -11,9 +11,9 @@ from Technologies.models import Technology
 
 class Project(Model):
     title: Field = CharField(max_length=100)
+    introduction: Field = CharField(max_length=500)
     description: Field = CharField(max_length=1000)
     url: Field = CharField(max_length=1000, null=True, blank=True)
-    is_public: Field = BooleanField(default=False)
     repository: Field = CharField(max_length=1000, null=True, blank=True)
     technologies: Field = ManyToManyField(Technology)
     authors: Field = ManyToManyField(Author)
