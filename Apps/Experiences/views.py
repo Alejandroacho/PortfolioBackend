@@ -12,7 +12,7 @@ class ExperienceViewSet(ListModelMixin, GenericViewSet):
     API endpoint that allows to interact with Experience model
     """
 
-    queryset: QuerySet = Experience.objects.all()
+    queryset: QuerySet = Experience.objects.all().order_by("-id")
     lookup_url_kwarg: str = "pk"
     serializer_class = ExperienceSerializer
     permission_classes = [AllowAny]

@@ -44,8 +44,10 @@ class Experience(Model):
             )
         else:
             delta: relativedelta = relativedelta(self.end_date, self.start_date)
+        years: str = "years" if delta.years > 1 else "year"
+        months: str = "months" if delta.months > 1 else "month"
         if delta.years == 0:
-            return f"{delta.months} months"
-        if delta.months == 0:
-            return f"{delta.years} years"
+            return f"{delta.months} {months}"
+        elif delta.months == 0:
+            return f"{delta.years} {years}"
         return f"{delta.years} years, {delta.months} months"
