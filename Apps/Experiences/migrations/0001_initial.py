@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ),
                 ("company", models.CharField(max_length=100)),
                 ("position", models.CharField(max_length=100)),
-                ("description", models.CharField(max_length=1000)),
+                ("description", models.TextField(max_length=1000)),
                 ("url", models.CharField(blank=True, max_length=1000, null=True)),
                 ("current", models.BooleanField(default=False)),
                 ("start_date", models.DateField()),

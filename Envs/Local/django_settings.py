@@ -4,7 +4,9 @@ from datetime import timedelta
 from Project.settings.default_django_settings import *
 
 
-URL: str = os.environ.get("PROJECT_URL", "http://localhost:8000")
+URL: str = "http://localhost:8000"
+
+MEDIA_URL: str = f"{URL}/media/"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY: str = "default-secret-key"

@@ -1,13 +1,17 @@
 from django.db.models import Model
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.fields import CharField
+from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
 from Images.models import Image
 
 
 class ImageSerializer(ModelSerializer):
-    url: str = CharField(source="image.url", read_only=True)
+    url: str = SerializerMethodField(method_name="get_url")
+
+    @staticmethod
+    def get_url(instance: Image) -> str:
+        return instance.url
 
     class Meta:
         model: Model = Image
