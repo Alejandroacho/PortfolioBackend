@@ -27,8 +27,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("title", models.CharField(max_length=100)),
-                ("introduction", models.CharField(max_length=500)),
-                ("description", models.CharField(max_length=1000)),
+                ("introduction", models.TextField(max_length=500)),
+                ("description", models.TextField(max_length=1000)),
                 ("url", models.CharField(blank=True, max_length=1000, null=True)),
                 (
                     "repository",

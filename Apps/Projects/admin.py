@@ -20,7 +20,6 @@ class ProjectAdmin(ModelAdmin):
                     "introduction",
                     "description",
                     "url",
-                    "is_public",
                     "repository",
                     "technologies",
                     "authors",

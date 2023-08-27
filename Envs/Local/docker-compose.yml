@@ -6,13 +6,13 @@ services:
     build:
       context: ../../
       dockerfile: ${DOCKERFILE_PATH}
-    image: &app app
+    image: app
     restart: always
     command: ${START_DJANGO}
     env_file: &envfile
       - ../../Envs/Local/variables.env
     ports:
-      - 8000:8000
+      - "8000:8000"
     volumes:
       - ../../Apps:/App/Apps
       - ../../Project:/App/Project
@@ -37,7 +37,7 @@ services:
     volumes:
       - ${DATA_FOLDER}/mysql:/var/lib/mysql
     ports:
-      - 3306:3306
+      - "3306:3306"
     expose:
       - 3306
     healthcheck:
@@ -50,9 +50,9 @@ services:
     container_name: redis
     image: ${REDIS}
     ports:
-      - 6378:6379
+      - "6378:6379"
     volumes:
-      - ${DATA_FOLDER}/redisdata:/data
+      - ${DATA_FOLDER}/redis:/data
     depends_on:
       - database
 
@@ -61,9 +61,9 @@ services:
     image: ${GRAFANA}
     user: root
     ports:
-      - 3000:3000
+      - "3000:3030"
     volumes:
-      - ${DATA_FOLDER}/grafana_data:/var/lib/grafana
+      - ${DATA_FOLDER}/grafana/data:/var/lib/grafana
       - ${DATA_FOLDER}/grafana/provisioning/:/etc/grafana/provisioning/
     restart: always
     depends_on:
@@ -83,7 +83,7 @@ services:
       - ${PROMETHEUS_YML}:/etc/prometheus/prometheus.yml
     command: --config.file=/etc/prometheus/prometheus.yml
     ports:
-      - 9090:9090
+      - "9090:9090"
     depends_on:
       database:
         condition: service_healthy

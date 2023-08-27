@@ -19,12 +19,21 @@ class CustomFileField(Base64FileField):
 
 class UserSerializer(ModelSerializer):
     cv = CustomFileField(required=False, allow_null=True)
-    image = ImageSerializer(many=True)
+    image = ImageSerializer()
     author = AuthorSerializer()
 
     class Meta:
         model: Model = User
-        fields: str = "__all__"
+        fields: str = [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "about",
+            "cv",
+            "image",
+            "author",
+        ]
         read_only_fields: list = ["id"]
         allow_empty_fields: list = [
             "image",

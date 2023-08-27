@@ -17,7 +17,7 @@ class TestImageModel:
 
     def test_str_representation(self) -> None:
         image: Image = ImageFaker()
-        assert str(image) == f"{image.id} | {image.type} image"
+        assert str(image) == f"{image.id} | {image.description}"
 
 
 @pytest.mark.django_db

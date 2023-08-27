@@ -9,6 +9,7 @@ from django.db.models import ForeignKey
 from django.db.models import ManyToManyField
 from django.db.models import Model
 from django.db.models.fields import DateField
+from django.db.models.fields import TextField
 
 from Images.models import Image
 from Technologies.models import Technology
@@ -17,7 +18,7 @@ from Technologies.models import Technology
 class Experience(Model):
     company: str = CharField(max_length=100)
     position: str = CharField(max_length=100)
-    description: str = CharField(max_length=1000)
+    description: str = TextField(max_length=1000)
     url: str = CharField(max_length=1000, null=True, blank=True)
     current: bool = BooleanField(default=False)
     start_date: datetime.date = DateField(auto_now=False, auto_now_add=False)
@@ -44,8 +45,10 @@ class Experience(Model):
             )
         else:
             delta: relativedelta = relativedelta(self.end_date, self.start_date)
+        years: str = "years" if delta.years > 1 else "year"
+        months: str = "months" if delta.months > 1 else "month"
         if delta.years == 0:
-            return f"{delta.months} months"
-        if delta.months == 0:
-            return f"{delta.years} years"
+            return f"{delta.months} {months}"
+        elif delta.months == 0:
+            return f"{delta.years} {years}"
         return f"{delta.years} years, {delta.months} months"
