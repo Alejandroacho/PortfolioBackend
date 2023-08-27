@@ -8,7 +8,7 @@ from Projects.serializers import ProjectSerializer
 
 
 class ProjectViewSet(ListModelMixin, GenericViewSet):
-    queryset: QuerySet = Project.objects.all().order_by("-id")
+    queryset: QuerySet = Project.objects.all().order_by("id")
     lookup_url_kwarg: str = "pk"
     serializer_class: ProjectSerializer = ProjectSerializer
     permission_classes = [AllowAny]
