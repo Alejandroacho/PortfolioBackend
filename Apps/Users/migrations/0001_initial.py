@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ("last_name", models.CharField(max_length=100)),
                 ("email", models.CharField(max_length=100)),
                 ("password", models.CharField(max_length=128, verbose_name="password")),
-                ("about", models.CharField(blank=True, max_length=5000)),
+                ("about", models.TextField(blank=True, max_length=5000)),
                 ("cv", models.FileField(blank=True, null=True, upload_to="")),
                 (
                     "author",

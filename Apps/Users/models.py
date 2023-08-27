@@ -8,6 +8,7 @@ from django.db.models import Field
 from django.db.models import FileField
 from django.db.models import ForeignKey
 from django.db.models import Model
+from django.db.models import TextField
 from django_prometheus.models import ExportModelOperationsMixin
 
 from Authors.models import Author
@@ -32,7 +33,7 @@ class User(
     email: Field = CharField(
         max_length=100, unique=True, null=False, blank=False
     )
-    about: Field = CharField(max_length=5000, null=False, blank=True)
+    about: Field = TextField(max_length=5000, null=False, blank=True)
     cv: Field = FileField(null=True, blank=True)
     image: Field = ForeignKey(
         Image,
